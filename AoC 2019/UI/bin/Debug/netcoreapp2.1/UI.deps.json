@@ -7,6 +7,9 @@
   "targets": {
     ".NETCoreApp,Version=v2.1": {
       "UI/1.0.0": {
+        "dependencies": {
+          "WireManagement": "1.0.0"
+        },
         "runtime": {
           "UI.dll": {}
         }
@@ -14,6 +17,11 @@
       "Intcode Computer/1.0.0": {
         "runtime": {
           "Intcode Computer.dll": {}
+        }
+      },
+      "WireManagement/1.0.0": {
+        "runtime": {
+          "WireManagement.dll": {}
         }
       }
     }
@@ -25,6 +33,11 @@
       "sha512": ""
     },
     "Intcode Computer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WireManagement/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

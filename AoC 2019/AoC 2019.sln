@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intcode Computer", "Intcode
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{C35E2437-5C1A-4C1A-9745-CB1984A872D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{A0EDD92F-7C6C-4A33-96EB-389BF65134D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WireManagement", "WireManagement\WireManagement.csproj", "{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{C35E2437-5C1A-4C1A-9745-CB1984A872D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C35E2437-5C1A-4C1A-9745-CB1984A872D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C35E2437-5C1A-4C1A-9745-CB1984A872D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0EDD92F-7C6C-4A33-96EB-389BF65134D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0EDD92F-7C6C-4A33-96EB-389BF65134D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0EDD92F-7C6C-4A33-96EB-389BF65134D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0EDD92F-7C6C-4A33-96EB-389BF65134D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

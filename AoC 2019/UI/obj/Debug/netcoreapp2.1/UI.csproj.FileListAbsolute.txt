@@ -15,3 +15,6 @@ C:\DEV\Personal\AoC2019\AoC 2019\UI\obj\Debug\netcoreapp2.1\UI.pdb
 C:\DEV\Personal\AoC2019\AoC 2019\UI\bin\Debug\netcoreapp2.1\Day2\Input.txt
 C:\DEV\Personal\AoC2019\AoC 2019\UI\bin\Debug\netcoreapp2.1\Day2\InputTest.txt
 C:\DEV\Personal\AoC2019\AoC 2019\UI\bin\Debug\netcoreapp2.1\Day2\OriginalInput.txt
+C:\DEV\Personal\AoC2019\AoC 2019\UI\bin\Debug\netcoreapp2.1\WireManagement.dll
+C:\DEV\Personal\AoC2019\AoC 2019\UI\bin\Debug\netcoreapp2.1\WireManagement.pdb
+C:\DEV\Personal\AoC2019\AoC 2019\UI\bin\Debug\netcoreapp2.1\Day3\Input1A.txt

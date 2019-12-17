@@ -5,6 +5,12 @@ namespace Intcode_Computer
 {
     public class IntcodeComputer
     {
+        private const string ACTION_NOUN = "noun";
+        private const string ACTION_VERB = "verb";
+        private const string ACTION_INSTRUCTION = "instruction";
+        private const string ACTION_OUTPOINTER = "outPointer";
+        private const string ERROR_MESSAGE = "ERROR: {0} pointer value {1} is larger than input length {2}!";
+
         public string ComputeIntcode(string input)
         {
             // convert to int array
@@ -16,15 +22,9 @@ namespace Intcode_Computer
             return intcodeArray.ConvertToIntcodeString();
         }
 
-        public object ComputeIntcode(int[] input, bool convertToString = true)
+        public int[] ComputeIntcode(int[] input)
         {
-            input = this.Compute(input);
-
-            if (convertToString)
-            {
-                return input.ConvertToIntcodeString();
-            }
-            return input;
+            return this.Compute(input);
         }
 
         private int[] Compute(int[] input)
@@ -79,26 +79,22 @@ namespace Intcode_Computer
         {
             if (input[instructionPointer] >= input.Length)
             {
-                Console.WriteLine($"ERROR: instruction value {input[instructionPointer]} is larger than input length {input.Length}!");
-                return false;
+                throw new ArgumentOutOfRangeException($"{ACTION_INSTRUCTION} pointer", String.Format(ERROR_MESSAGE, ACTION_INSTRUCTION, input[instructionPointer], input.Length));
             }
 
             if (input[nounPointer] >= input.Length)
             {
-                Console.WriteLine($"ERROR: noun value {input[nounPointer]} is larger than input length {input.Length}!");
-                return false;
+                throw new ArgumentOutOfRangeException($"{ACTION_NOUN} pointer", String.Format(ERROR_MESSAGE, ACTION_NOUN, input[nounPointer], input.Length));
             }
 
             if (input[verbPointer] >= input.Length)
             {
-                Console.WriteLine($"ERROR: verb value {input[verbPointer]} is larger than input length {input.Length}!");
-                return false;
+                throw new ArgumentOutOfRangeException($"{ACTION_VERB} pointer", String.Format(ERROR_MESSAGE, ACTION_VERB, input[verbPointer], input.Length));
             }
 
             if (input[outPointer] >= input.Length)
             {
-                Console.WriteLine($"ERROR: outPointer value {input[outPointer]} is larger than input length {input.Length}!");
-                return false;
+                throw new ArgumentOutOfRangeException($"{ACTION_OUTPOINTER} pointer", String.Format(ERROR_MESSAGE, ACTION_OUTPOINTER, input[outPointer], input.Length));
             }
 
             return true;

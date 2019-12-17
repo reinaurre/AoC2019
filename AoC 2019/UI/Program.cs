@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Intcode_Computer;
+using WireManagement;
 
 namespace UI
 {
@@ -15,6 +16,10 @@ namespace UI
             Console.WriteLine();
             Console.WriteLine("Day 2 Part 2:");
             Day2Part2();
+
+            Console.WriteLine();
+            Console.WriteLine("Day 3 Part 1:");
+            Day3Part1();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -38,7 +43,7 @@ namespace UI
                 Console.WriteLine("Intcode Input:");
                 Console.WriteLine(str);
 
-                string output = (string)IC.ComputeIntcode(str);
+                string output = IC.ComputeIntcode(str);
 
                 Console.WriteLine("Intcode Output:");
                 Console.WriteLine(output);
@@ -79,8 +84,8 @@ namespace UI
                                     testIntcode[1] = noun;
                                     testIntcode[2] = verb;
 
-                                    Console.WriteLine($"Noun = {noun}. Verb = {verb}");
-                                    testIntcode = (int[])IC.ComputeIntcode(testIntcode, false);
+                                    // Console.WriteLine($"Noun = {noun}. Verb = {verb}");
+                                    testIntcode = IC.ComputeIntcode(testIntcode);
 
                                     if (testIntcode[0] == 19690720)
                                     {
@@ -95,6 +100,33 @@ namespace UI
 
                 counter++;
             }
+        }
+
+        public static void Day3Part1()
+        {
+            IntersectionDistanceCalculator IDC = new IntersectionDistanceCalculator();
+
+            Console.WriteLine("Parsing Input...");
+            string[] wires = File.ReadAllLines("Day3/Input1A.txt");
+
+            Console.WriteLine($"Minimum Manhattan Distance = {IDC.FindSmallestManhattanDistance(wires[0].ConvertToCommands(), wires[1].ConvertToCommands())}");
+            //PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+        }
+
+        private static void PrintGrid(int[,] grid, int maxX, int maxY)
+        {
+            StreamWriter outputTxt = File.CreateText("Day3/GridOutput.txt");
+
+            for(int i = 0; i < maxY; i++)
+            {
+                for(int j = 0; j < maxX; j++)
+                {
+                    outputTxt.Write(grid[j, i]);
+                }
+                outputTxt.WriteLine();
+            }
+
+            outputTxt.Close();
         }
     }
 }

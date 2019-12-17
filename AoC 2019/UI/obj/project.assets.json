@@ -217,6 +217,16 @@
         "runtime": {
           "bin/placeholder/Intcode Computer.dll": {}
         }
+      },
+      "WireManagement/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/WireManagement.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/WireManagement.dll": {}
+        }
       }
     }
   },
@@ -695,12 +705,18 @@
       "type": "project",
       "path": "../Intcode Computer/Intcode Computer.csproj",
       "msbuildProject": "../Intcode Computer/Intcode Computer.csproj"
+    },
+    "WireManagement/1.0.0": {
+      "type": "project",
+      "path": "../WireManagement/WireManagement.csproj",
+      "msbuildProject": "../WireManagement/WireManagement.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
       "Intcode Computer >= 1.0.0",
-      "Microsoft.NETCore.App >= 2.1.0"
+      "Microsoft.NETCore.App >= 2.1.0",
+      "WireManagement >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -735,6 +751,9 @@
           "projectReferences": {
             "C:\\DEV\\Personal\\AoC2019\\AoC 2019\\Intcode Computer\\Intcode Computer.csproj": {
               "projectPath": "C:\\DEV\\Personal\\AoC2019\\AoC 2019\\Intcode Computer\\Intcode Computer.csproj"
+            },
+            "C:\\DEV\\Personal\\AoC2019\\AoC 2019\\WireManagement\\WireManagement.csproj": {
+              "projectPath": "C:\\DEV\\Personal\\AoC2019\\AoC 2019\\WireManagement\\WireManagement.csproj"
             }
           }
         }
