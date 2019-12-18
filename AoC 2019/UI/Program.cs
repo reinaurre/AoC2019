@@ -22,6 +22,10 @@ namespace UI
             Day3Part1();
 
             Console.WriteLine();
+            Console.WriteLine("Day 3 Part 2:");
+            Day3Part2();
+
+            Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
             Console.ReadLine();
         }
@@ -110,6 +114,17 @@ namespace UI
             string[] wires = File.ReadAllLines("Day3/Input1A.txt");
 
             Console.WriteLine($"Minimum Manhattan Distance = {IDC.FindSmallestManhattanDistance(wires[0].ConvertToCommands(), wires[1].ConvertToCommands())}");
+            //PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+        }
+
+        public static void Day3Part2()
+        {
+            IntersectionDistanceCalculator IDC = new IntersectionDistanceCalculator();
+
+            Console.WriteLine("Parsing Input...");
+            string[] wires = File.ReadAllLines("Day3/Input1A.txt");
+
+            Console.WriteLine($"Minimum Manhattan Distance = {IDC.FindShortestIntersectionPath(wires[0].ConvertToCommands(), wires[1].ConvertToCommands())}");
             //PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
         }
 

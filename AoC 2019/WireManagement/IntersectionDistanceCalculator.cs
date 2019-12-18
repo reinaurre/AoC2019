@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace WireManagement
@@ -10,6 +11,7 @@ namespace WireManagement
         public int[,] WireGrid { get; private set; }
         public int maxXsize;
         public int maxYsize;
+        public Coordinate origin;
 
         private int Xmax = 0;
         private int Xmin = 0;
@@ -18,7 +20,52 @@ namespace WireManagement
 
         private List<Intersection> intersectionList = new List<Intersection>();
 
+        private const int WIRE_1_ID = 1; // self intersections = 2, joint = 4
+        private const int WIRE_2_ID = 3; // self intersections = 6, joint = 4
+
         public int FindSmallestManhattanDistance(Command[] wire1, Command[] wire2)
+        {
+            this.BuildGraph(wire1, wire2);
+
+            return this.intersectionList.SortByManhattanDistance().First(i => i.ManhattanDistance != 0).ManhattanDistance;
+        }
+
+        public int FindShortestIntersectionPath(Command[] wire1, Command[] wire2)
+        {
+            this.BuildGraph(wire1, wire2);
+
+            List<Coordinate> path = new List<Coordinate>();
+            path.Add(this.origin);
+            this.FindShortestPath(this.origin.X, this.origin.Y, WIRE_1_ID, path);
+
+            path = new List<Coordinate>();
+            path.Add(this.origin);
+            this.FindShortestPath(this.origin.X, this.origin.Y, WIRE_2_ID, path);
+
+            int minPath = int.MaxValue;
+            foreach(Intersection intsx in this.intersectionList)
+            {
+                int temp = this.CalculateIntersectionLength(intsx);
+                if(temp != 0 && temp < minPath)
+                {
+                    minPath = temp;
+                }
+            }
+
+            return minPath;
+        }
+
+        public int FindManhattanDistance(Intersection coordinate, int originX, int originY)
+        {
+            return coordinate.ManhattanDistance = Math.Abs((Math.Abs(coordinate.X) - Math.Abs(originX))) + Math.Abs((Math.Abs(coordinate.Y) - Math.Abs(originY)));
+        }
+
+        public int CalculateIntersectionLength(Intersection coordinate)
+        {
+            return coordinate.LengthA + coordinate.LengthB;
+        }
+
+        private void BuildGraph(Command[] wire1, Command[] wire2)
         {
             this.CalculateBoundaries(wire1);
             this.CalculateBoundaries(wire2);
@@ -27,31 +74,16 @@ namespace WireManagement
             this.maxYsize = Math.Abs(this.Ymax) + Math.Abs(this.Ymin) + 1;
             int startX = this.maxXsize - this.Xmax - 1;
             int startY = this.maxYsize - this.Ymax - 1;
-
-
-            int wire1ID = 1;
-            int wire2ID = 2;
+            this.origin = new Coordinate(startX, startY);
 
             this.WireGrid = new int[this.maxXsize, this.maxYsize];
-            this.PlotTrack(wire1, wire1ID, startX, startY);
-            this.PlotTrack(wire2, wire2ID, startX, startY);
+            this.PlotTrack(wire1, WIRE_1_ID);
+            this.PlotTrack(wire2, WIRE_2_ID);
 
-            int minValue = int.MaxValue;
-            for(int i = 0; i < intersectionList.Count; i++)
+            for (int i = 0; i < intersectionList.Count; i++)
             {
-                int temp = this.FindManhattanDistance(intersectionList[i], startX, startY);
-                if(temp < minValue && temp != 0)
-                {
-                    minValue = temp;
-                }
+                this.FindManhattanDistance(intersectionList[i], startX, startY);
             }
-
-            return minValue;
-        }
-
-        public int FindManhattanDistance(Intersection coordinate, int originX, int originY)
-        {
-            return Math.Abs((Math.Abs(coordinate.X) - Math.Abs(originX))) + Math.Abs((Math.Abs(coordinate.Y) - Math.Abs(originY)));
         }
 
         private void CalculateBoundaries(Command[] commands)
@@ -115,32 +147,34 @@ namespace WireManagement
             }
         }
 
-        private void PlotTrack(Command[] commands, int trackNum, int startX, int startY)
+        private void PlotTrack(Command[] commands, int trackNum)
         {
-            int curX = startX;
-            int curY = startY;
+            int curX = this.origin.X;
+            int curY = this.origin.Y;
+            int pathLength = 0;
 
             for (int i = 0; i < commands.Length; i++)
             {
                 switch (commands[i].Direction)
                 {
                     case Direction.Up:
-                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, 1, ref curY);
+                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, 1, ref curY, ref pathLength);
                         break;
                     case Direction.Down:
-                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, -1, ref curY);
+                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, -1, ref curY, ref pathLength);
                         break;
                     case Direction.Left:
-                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, -1, ref curX);
+                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, -1, ref curX, ref pathLength);
                         break;
                     case Direction.Right:
-                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, 1, ref curX);
+                        this.TraverseInstruction(ref curX, ref curY, commands[i].Distance, trackNum, 1, ref curX, ref pathLength);
                         break;
                 }
             }
         }
 
-        private void TraverseInstruction(ref int curX, ref int curY, int target, int trackNum, int delta, ref int axisValue)
+        // this can be moved elsewhere
+        private void TraverseInstruction(ref int curX, ref int curY, int target, int trackNum, int delta, ref int axisValue, ref int pathLength)
         {
             for (int j = 0; j < target; j++)
             {
@@ -151,9 +185,54 @@ namespace WireManagement
                 else if (this.WireGrid[curX, curY] != trackNum)
                 {
                     this.WireGrid[curX, curY] += trackNum;
-                    this.intersectionList.Add(new Intersection(curX, curY));
+                    this.intersectionList.Add(new Intersection(curX, curY, this.WireGrid[curX,curY] == trackNum * 2));
                 }
+
                 axisValue += delta;
+                pathLength++;
+            }
+        }
+
+        // This should be moved elsewhere
+        private void FindShortestPath(int curX, int curY, int trackNum, List<Coordinate> path)
+        {
+            // TODO: Stack Overflow
+            if(this.intersectionList.Count(i => i.X == curX && i.Y == curY) > 0)
+            {
+                if(trackNum == WIRE_1_ID)
+                {
+                    this.intersectionList.First(i => i.X == curX && i.Y == curY).LengthA = path.Count;
+                }
+                else
+                {
+                    this.intersectionList.First(i => i.X == curX && i.Y == curY).LengthB = path.Count;
+                }
+            }
+            else if(path.Count(p => p.X == curX && p.Y == curY) > 0)
+            {
+                return; // found a loop
+            }
+
+            path.Add(new Coordinate(curX, curY));
+
+            if(curX > 0 && this.WireGrid[curX-1,curY] != 0)
+            {
+                this.FindShortestPath(curX - 1, curY, trackNum, path);
+            }
+
+            if (curX < this.Xmax && this.WireGrid[curX + 1, curY] != 0)
+            {
+                this.FindShortestPath(curX + 1, curY, trackNum, path);
+            }
+
+            if (curY < this.Ymax && this.WireGrid[curX, curY + 1] != 0)
+            {
+                this.FindShortestPath(curX, curY + 1, trackNum, path);
+            }
+
+            if (curY > 0 && this.WireGrid[curX, curY - 1] != 0)
+            {
+                this.FindShortestPath(curX, curY - 1, trackNum, path);
             }
         }
     }
