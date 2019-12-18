@@ -109,23 +109,55 @@ namespace UI
         public static void Day3Part1()
         {
             IntersectionDistanceCalculator IDC = new IntersectionDistanceCalculator();
+            string fileName = "Day3/Input1B_Test.txt";
+            //string fileName = "Day3/Input1A.txt";
 
             Console.WriteLine("Parsing Input...");
-            string[] wires = File.ReadAllLines("Day3/Input1A.txt");
+            string[] wires = File.ReadAllLines(fileName);
 
             Console.WriteLine($"Minimum Manhattan Distance = {IDC.FindSmallestManhattanDistance(wires[0].ConvertToCommands(), wires[1].ConvertToCommands())}");
-            //PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+            
+            if (fileName.Contains("Test"))
+            {
+                PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+            }
         }
 
         public static void Day3Part2()
         {
             IntersectionDistanceCalculator IDC = new IntersectionDistanceCalculator();
+            string fileName = "Day3/Input1B_Test.txt";
+            //string fileName = "Day3/Input1A.txt";
 
             Console.WriteLine("Parsing Input...");
-            string[] wires = File.ReadAllLines("Day3/Input1A.txt");
+            string[] wires = File.ReadAllLines(fileName);
 
-            Console.WriteLine($"Minimum Manhattan Distance = {IDC.FindShortestIntersectionPath(wires[0].ConvertToCommands(), wires[1].ConvertToCommands())}");
-            //PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+            Console.WriteLine($"Minimum Intersection Distance = {IDC.FindShortestIntersectionPath(wires[0].ConvertToCommands(), wires[1].ConvertToCommands())}");
+
+            if (fileName.Contains("Test"))
+            {
+                DisplayGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+                //PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+            }
+        }
+
+        private static void DisplayGrid(int[,] grid, int maxX, int maxY)
+        {
+            for (int i = maxY - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < maxX; j++)
+                {
+                    if (grid[j, i] == 0)
+                    {
+                        Console.Write(". ");
+                    }
+                    else
+                    {
+                        Console.Write($"{grid[j, i]} ");
+                    }
+                }
+                Console.WriteLine();
+            }
         }
 
         private static void PrintGrid(int[,] grid, int maxX, int maxY)
@@ -136,7 +168,14 @@ namespace UI
             {
                 for(int j = 0; j < maxX; j++)
                 {
-                    outputTxt.Write(grid[j, i]);
+                    if (grid[j, i] == 0)
+                    {
+                        outputTxt.Write(".");
+                    }
+                    else
+                    {
+                        outputTxt.Write($"{grid[j, i]}");
+                    }
                 }
                 outputTxt.WriteLine();
             }

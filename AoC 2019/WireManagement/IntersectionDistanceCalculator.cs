@@ -46,7 +46,7 @@ namespace WireManagement
             foreach(Intersection intsx in this.intersectionList)
             {
                 int temp = this.CalculateIntersectionLength(intsx);
-                if(temp != 0 && temp < minPath)
+                if(temp != 0 && temp < minPath && intsx.ManhattanDistance > 0)
                 {
                     minPath = temp;
                 }
@@ -196,43 +196,94 @@ namespace WireManagement
         // This should be moved elsewhere
         private void FindShortestPath(int curX, int curY, int trackNum, List<Coordinate> path)
         {
-            // TODO: Stack Overflow
-            if(this.intersectionList.Count(i => i.X == curX && i.Y == curY) > 0)
+            bool hasNext = true;
+            int otherPathValue = trackNum == WIRE_1_ID ? WIRE_2_ID : WIRE_1_ID;
+
+            while (hasNext)
             {
-                if(trackNum == WIRE_1_ID)
+                if (this.intersectionList.Count(i => i.X == curX && i.Y == curY) > 0)
                 {
-                    this.intersectionList.First(i => i.X == curX && i.Y == curY).LengthA = path.Count;
+                    if (trackNum == WIRE_1_ID)
+                    {
+                        // -1 because the root node is entered twice
+                        this.intersectionList.First(i => i.X == curX && i.Y == curY).LengthA = path.Count-1;
+                    }
+                    else
+                    {
+                        this.intersectionList.First(i => i.X == curX && i.Y == curY).LengthB = path.Count-1;
+                    }
+                }
+                else if (path.Count(p => p.X == curX && p.Y == curY) > 0)
+                {
+                    hasNext = false;
+                    return; // found a loop
+                }
+
+                int pathOptions = 0;
+                Direction dir = Direction.Up; // default doesn't matter, if it's used it'll have been assigned.
+
+                int prevX = path[path.Count - 1].X;
+                int prevY = path[path.Count - 1].Y;
+                if (curX > 0 && this.WireGrid[curX - 1, curY] != 0 && this.WireGrid[curX-1,curY] != otherPathValue && curX - 1 != prevX)
+                {
+                    pathOptions++;
+                    dir = Direction.Left;
+                }
+                if (curX < this.Xmax && this.WireGrid[curX + 1, curY] != 0 && this.WireGrid[curX + 1, curY] != otherPathValue && curX + 1 != prevX)
+                {
+                    pathOptions++;
+                    dir = Direction.Right;
+                }
+                if (curY < this.Ymax && this.WireGrid[curX, curY + 1] != 0 && this.WireGrid[curX, curY + 1] != otherPathValue && curY + 1 != prevY)
+                {
+                    pathOptions++;
+                    dir = Direction.Up;
+                }
+                if (curY > 0 && this.WireGrid[curX, curY - 1] != 0 && this.WireGrid[curX, curY - 1] != otherPathValue && curY - 1 != prevY)
+                {
+                    pathOptions++;
+                    dir = Direction.Down;
+                }
+
+                path.Add(new Coordinate(curX, curY));
+
+                if (pathOptions == 0)
+                {
+                    hasNext = false;
+                    return;
+                }
+                else if(pathOptions == 1)
+                {
+                    switch (dir)
+                    {
+                        case Direction.Left: curX--; break;
+                        case Direction.Right: curX++; break;
+                        case Direction.Up: curY++; break;
+                        case Direction.Down: curY--; break;
+                    }
                 }
                 else
                 {
-                    this.intersectionList.First(i => i.X == curX && i.Y == curY).LengthB = path.Count;
+                    if (curX > 0 && this.WireGrid[curX - 1, curY] != 0 && this.WireGrid[curX - 1, curY] != otherPathValue)
+                    {
+                        this.FindShortestPath(curX - 1, curY, trackNum, path);
+                    }
+
+                    if (curX < this.Xmax && this.WireGrid[curX + 1, curY] != 0 && this.WireGrid[curX + 1, curY] != otherPathValue)
+                    {
+                        this.FindShortestPath(curX + 1, curY, trackNum, path);
+                    }
+
+                    if (curY < this.Ymax && this.WireGrid[curX, curY + 1] != 0 && this.WireGrid[curX, curY + 1] != otherPathValue)
+                    {
+                        this.FindShortestPath(curX, curY + 1, trackNum, path);
+                    }
+
+                    if (curY > 0 && this.WireGrid[curX, curY - 1] != 0 && this.WireGrid[curX, curY - 1] != otherPathValue)
+                    {
+                        this.FindShortestPath(curX, curY - 1, trackNum, path);
+                    }
                 }
-            }
-            else if(path.Count(p => p.X == curX && p.Y == curY) > 0)
-            {
-                return; // found a loop
-            }
-
-            path.Add(new Coordinate(curX, curY));
-
-            if(curX > 0 && this.WireGrid[curX-1,curY] != 0)
-            {
-                this.FindShortestPath(curX - 1, curY, trackNum, path);
-            }
-
-            if (curX < this.Xmax && this.WireGrid[curX + 1, curY] != 0)
-            {
-                this.FindShortestPath(curX + 1, curY, trackNum, path);
-            }
-
-            if (curY < this.Ymax && this.WireGrid[curX, curY + 1] != 0)
-            {
-                this.FindShortestPath(curX, curY + 1, trackNum, path);
-            }
-
-            if (curY > 0 && this.WireGrid[curX, curY - 1] != 0)
-            {
-                this.FindShortestPath(curX, curY - 1, trackNum, path);
             }
         }
     }
