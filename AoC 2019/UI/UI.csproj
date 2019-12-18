@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodeCracker\CodeCracker.csproj" />
     <ProjectReference Include="..\Intcode Computer\Intcode Computer.csproj" />
     <ProjectReference Include="..\WireManagement\WireManagement.csproj" />
   </ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using CodeCracker;
 using Intcode_Computer;
 using WireManagement;
 
@@ -24,6 +25,14 @@ namespace UI
             Console.WriteLine();
             Console.WriteLine("Day 3 Part 2:");
             Day3Part2();
+
+            Console.WriteLine();
+            Console.WriteLine("Day 4 Part 1:");
+            Day4Part1();
+
+            Console.WriteLine();
+            Console.WriteLine("Day 4 Part 2:");
+            Day4Part2();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -109,8 +118,8 @@ namespace UI
         public static void Day3Part1()
         {
             IntersectionDistanceCalculator IDC = new IntersectionDistanceCalculator();
-            string fileName = "Day3/Input1B_Test.txt";
-            //string fileName = "Day3/Input1A.txt";
+            //string fileName = "Day3/Input1B_Test.txt";
+            string fileName = "Day3/Input1A.txt";
 
             Console.WriteLine("Parsing Input...");
             string[] wires = File.ReadAllLines(fileName);
@@ -126,8 +135,8 @@ namespace UI
         public static void Day3Part2()
         {
             IntersectionDistanceCalculator IDC = new IntersectionDistanceCalculator();
-            string fileName = "Day3/Input1B_Test.txt";
-            //string fileName = "Day3/Input1A.txt";
+            //string fileName = "Day3/Input1B_Test.txt";
+            string fileName = "Day3/Input1A.txt";
 
             Console.WriteLine("Parsing Input...");
             string[] wires = File.ReadAllLines(fileName);
@@ -136,9 +145,45 @@ namespace UI
 
             if (fileName.Contains("Test"))
             {
-                DisplayGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
-                //PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+                // DisplayGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
+                PrintGrid(IDC.WireGrid, IDC.maxXsize, IDC.maxYsize);
             }
+        }
+
+        public static void Day4Part1()
+        {
+            BruteForcer BF = new BruteForcer();
+
+            int start = 264793;
+            int end = 803935;
+
+            // Test Values
+            BF.BruteForce(111111, 111111); // true
+            BF.BruteForce(223450, 223450); // false - 5->0
+            BF.BruteForce(123789, 123789); // false - no double
+
+            Console.WriteLine($"Start Value: {start}.");
+            Console.WriteLine($"End Value: {end}.");
+
+            Console.WriteLine($"Number of Valid Codes = {BF.GetNumberOfValidCodes(start, end)}");
+        }
+
+        public static void Day4Part2()
+        {
+            BruteForcer BF = new BruteForcer();
+
+            int start = 264793;
+            int end = 803935;
+
+            // Test Values
+            BF.BruteForce(112233, 112233, true); // true
+            BF.BruteForce(123444, 123444, true); // false - 444 triple
+            BF.BruteForce(111122, 111122, true); // true - double 2
+
+            Console.WriteLine($"Start Value: {start}.");
+            Console.WriteLine($"End Value: {end}.");
+
+            Console.WriteLine($"Number of Valid Codes = {BF.GetNumberOfValidCodes(start, end, true)}");
         }
 
         private static void DisplayGrid(int[,] grid, int maxX, int maxY)

@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day 1", "AoC 2019\Day 1.csproj", "{417D3918-578C-400F-B17B-BA838602508A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day 1", "AoC 2019\Day 1.csproj", "{417D3918-578C-400F-B17B-BA838602508A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intcode Computer", "Intcode Computer\Intcode Computer.csproj", "{60E9D05F-01D2-419E-90D8-D47FC661D1CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Intcode Computer", "Intcode Computer\Intcode Computer.csproj", "{60E9D05F-01D2-419E-90D8-D47FC661D1CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{C35E2437-5C1A-4C1A-9745-CB1984A872D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UI", "UI\UI.csproj", "{C35E2437-5C1A-4C1A-9745-CB1984A872D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{A0EDD92F-7C6C-4A33-96EB-389BF65134D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{A0EDD92F-7C6C-4A33-96EB-389BF65134D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WireManagement", "WireManagement\WireManagement.csproj", "{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WireManagement", "WireManagement\WireManagement.csproj", "{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCracker", "CodeCracker\CodeCracker.csproj", "{09C066D4-1BA6-45B6-BB0C-07C8E673338E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6A205E8-10CB-4B07-9CAE-8140C38E8EE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09C066D4-1BA6-45B6-BB0C-07C8E673338E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09C066D4-1BA6-45B6-BB0C-07C8E673338E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09C066D4-1BA6-45B6-BB0C-07C8E673338E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09C066D4-1BA6-45B6-BB0C-07C8E673338E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -34,13 +34,8 @@ namespace WireManagement
         {
             this.BuildGraph(wire1, wire2);
 
-            List<Coordinate> path = new List<Coordinate>();
-            path.Add(this.origin);
-            this.FindShortestPath(this.origin.X, this.origin.Y, WIRE_1_ID, path);
-
-            path = new List<Coordinate>();
-            path.Add(this.origin);
-            this.FindShortestPath(this.origin.X, this.origin.Y, WIRE_2_ID, path);
+            this.FindPathLengths(wire1, WIRE_1_ID);
+            this.FindPathLengths(wire2, WIRE_2_ID);
 
             int minPath = int.MaxValue;
             foreach(Intersection intsx in this.intersectionList)
@@ -151,9 +146,53 @@ namespace WireManagement
         {
             int curX = this.origin.X;
             int curY = this.origin.Y;
-            int pathLength = 0;
 
             for (int i = 0; i < commands.Length; i++)
+            {
+                switch (commands[i].Direction)
+                {
+                    case Direction.Up:
+                        this.PlotInstruction(ref curX, ref curY, commands[i].Distance, trackNum, 1, ref curY);
+                        break;
+                    case Direction.Down:
+                        this.PlotInstruction(ref curX, ref curY, commands[i].Distance, trackNum, -1, ref curY);
+                        break;
+                    case Direction.Left:
+                        this.PlotInstruction(ref curX, ref curY, commands[i].Distance, trackNum, -1, ref curX);
+                        break;
+                    case Direction.Right:
+                        this.PlotInstruction(ref curX, ref curY, commands[i].Distance, trackNum, 1, ref curX);
+                        break;
+                }
+            }
+        }
+
+        // this can be moved elsewhere
+        private void PlotInstruction(ref int curX, ref int curY, int dest, int trackNum, int delta, ref int axisValue)
+        {
+            for (int j = 0; j < dest; j++)
+            {
+                if (this.WireGrid[curX, curY] == 0)
+                {
+                    this.WireGrid[curX, curY] = trackNum;
+                }
+                else if (this.WireGrid[curX, curY] != trackNum)
+                {
+                    this.WireGrid[curX, curY] += trackNum;
+                    this.intersectionList.Add(new Intersection(curX, curY, this.WireGrid[curX,curY] == trackNum * 2));
+                }
+
+                axisValue += delta;
+            }
+        }
+
+        private void FindPathLengths(Command[] commands, int trackNum)
+        {
+            int curX = this.origin.X;
+            int curY = this.origin.Y;
+            int pathLength = 0;
+
+            for(int i = 0; i < commands.Length; i++)
             {
                 switch (commands[i].Direction)
                 {
@@ -173,19 +212,23 @@ namespace WireManagement
             }
         }
 
-        // this can be moved elsewhere
-        private void TraverseInstruction(ref int curX, ref int curY, int target, int trackNum, int delta, ref int axisValue, ref int pathLength)
+        private void TraverseInstruction(ref int curX, ref int curY, int dest, int trackNum, int delta, ref int axisValue, ref int pathLength)
         {
-            for (int j = 0; j < target; j++)
+            for(int j = 0; j < dest; j++)
             {
-                if (this.WireGrid[curX, curY] == 0)
+                int x = curX;
+                int y = curY;
+
+                if (this.intersectionList.Count(i => i.X == x && i.Y == y) > 0)
                 {
-                    this.WireGrid[curX, curY] = trackNum;
-                }
-                else if (this.WireGrid[curX, curY] != trackNum)
-                {
-                    this.WireGrid[curX, curY] += trackNum;
-                    this.intersectionList.Add(new Intersection(curX, curY, this.WireGrid[curX,curY] == trackNum * 2));
+                    if (trackNum == WIRE_1_ID)
+                    {
+                        this.intersectionList.First(i => i.X == x && i.Y == y).LengthA = pathLength;
+                    }
+                    else
+                    {
+                        this.intersectionList.First(i => i.X == x && i.Y == y).LengthB = pathLength;
+                    }
                 }
 
                 axisValue += delta;
