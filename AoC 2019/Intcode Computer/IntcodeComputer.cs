@@ -7,7 +7,7 @@ namespace Intcode_Computer
     {
         private const string ACTION_NOUN = "noun";
         private const string ACTION_VERB = "verb";
-        private const string ACTION_INSTRUCTION = "instruction";
+        private const string ACTION_OPCODE = "opcode";
         private const string ACTION_OUTPOINTER = "outPointer";
         private const string ERROR_MESSAGE = "ERROR: {0} pointer value {1} is larger than input length {2}!";
 
@@ -79,7 +79,7 @@ namespace Intcode_Computer
         {
             if (input[instructionPointer] >= input.Length)
             {
-                throw new ArgumentOutOfRangeException($"{ACTION_INSTRUCTION} pointer", String.Format(ERROR_MESSAGE, ACTION_INSTRUCTION, input[instructionPointer], input.Length));
+                throw new ArgumentOutOfRangeException($"{ACTION_OPCODE} pointer", String.Format(ERROR_MESSAGE, ACTION_OPCODE, input[instructionPointer], input.Length));
             }
 
             if (input[nounPointer] >= input.Length)
