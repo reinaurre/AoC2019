@@ -35,6 +35,10 @@ namespace UI
             Day4Part2();
 
             Console.WriteLine();
+            Console.WriteLine("Day 5 Part 1:");
+            Day5Part1();
+
+            Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
             Console.ReadLine();
         }
@@ -184,6 +188,56 @@ namespace UI
             Console.WriteLine($"End Value: {end}.");
 
             Console.WriteLine($"Number of Valid Codes = {BF.GetNumberOfValidCodes(start, end, true)}");
+        }
+
+        public static void Day5Part1()
+        {
+            IntcodeComputer IC = new IntcodeComputer();
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines("Day5/OfficialInput.txt");
+            //string[] input = File.ReadAllLines("Day5/Part1Test.txt");
+
+            int counter = 0;
+            foreach (string str in lines)
+            {
+                // Part 1
+                Console.Write("Enter Input Value: ");
+                string inputStr = Console.ReadLine();
+                int inputVal = Convert.ToInt32(inputStr);
+
+                string output = IC.ComputeIntcode(str, inputVal);
+
+                Console.WriteLine("Intcode Output:");
+                Console.WriteLine(output);
+
+                counter++;
+            }
+        }
+
+        public static void Day5Part2()
+        {
+            IntcodeComputer IC = new IntcodeComputer();
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines("Day5/OfficialInput.txt");
+            //string[] input = File.ReadAllLines("Day5/Part2Test.txt");
+
+            int counter = 0;
+            foreach (string str in lines)
+            {
+                // Part 1
+                Console.Write("Enter Input Value: ");
+                string inputStr = Console.ReadLine();
+                int inputVal = Convert.ToInt32(inputStr);
+
+                string output = IC.ComputeIntcode(str, inputVal);
+
+                Console.WriteLine("Intcode Output:");
+                Console.WriteLine(output);
+
+                counter++;
+            }
         }
 
         private static void DisplayGrid(int[,] grid, int maxX, int maxY)

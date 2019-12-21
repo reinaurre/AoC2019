@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Intcode_Computer
@@ -11,68 +12,94 @@ namespace Intcode_Computer
         private const string ACTION_OUTPOINTER = "outPointer";
         private const string ERROR_MESSAGE = "ERROR: {0} pointer value {1} is larger than input length {2}!";
 
-        public string ComputeIntcode(string input)
+        public string ComputeIntcode(string codeArr, int input = int.MaxValue)
         {
             // convert to int array
-            int[] intcodeArray = input.ConvertToIntArray();
+            int[] intcodeArray = codeArr.ConvertToIntArray();
 
             // compute!
-            intcodeArray = this.Compute(intcodeArray);
+            intcodeArray = this.Compute(intcodeArray, input);
 
             return intcodeArray.ConvertToIntcodeString();
         }
 
-        public int[] ComputeIntcode(int[] input)
+        public int[] ComputeIntcode(int[] codeArr, int input = int.MaxValue)
         {
-            return this.Compute(input);
+            return this.Compute(codeArr, input);
         }
 
-        private int[] Compute(int[] input)
+        private int[] Compute(int[] codeArr, int input)
         {
-            if(input.Length < 4)
+            int pointer = 0;
+            List<int> output = new List<int>();
+
+            while (pointer + 1 < codeArr.Length)
             {
-                return input;
+                Operation op = new Operation(codeArr[pointer]);
+
+                switch (op.Opcode)
+                {
+                    case Opcodes.Add:
+                        this.Add(codeArr, pointer, op);
+                        break;
+                    case Opcodes.Multiply:
+                        this.Multiply(codeArr, pointer, op);
+                        break;
+                    case Opcodes.Input:
+                        this.Input(codeArr, pointer + 1, input, op);
+                        break;
+                    case Opcodes.Output:
+                        output.Add(this.Output(codeArr, pointer + 1, op));
+                        break;
+                    case Opcodes.Terminate:
+                        if (output.Count > 0)
+                        {
+                            return output.ToArray();
+                        }
+                        return codeArr;
+                }
+
+                pointer += op.Length;
             }
 
-            int instructionPointer = 0;
-            int nounPointer = 1;
-            int verbPointer = 2;
-            int outPointer = 3;
-
-            while(input[instructionPointer] != 99 && instructionPointer+3 < input.Length)
+            if(output.Count > 0)
             {
-                if(!CheckValid(input, instructionPointer, nounPointer, verbPointer, outPointer))
-                {
-                    return input;
-                }
-
-                // Addition
-                if(input[instructionPointer] == 1)
-                {
-                    input[input[outPointer]] = input[input[nounPointer]] + input[input[verbPointer]];
-                }
-                // Multiplication
-                else if(input[instructionPointer] == 2)
-                {
-                    input[input[outPointer]] = input[input[nounPointer]] * input[input[verbPointer]];
-                }
-                // Finished
-                else if(input[instructionPointer] == 99)
-                {
-                    return input;
-                }
-                else
-                {
-                    throw new Exception($"{input[instructionPointer]} is not a valid operator!");
-                }
-
-                instructionPointer += 4;
-                nounPointer += 4;
-                verbPointer += 4;
-                outPointer += 4;
+                return output.ToArray();
             }
 
-            return input;
+            return codeArr;
+        }
+
+        public void Add(int[] codeArr, int instructionPointer, Operation op)
+        {
+            int a = op.Param1Immediate ? codeArr[instructionPointer + 1] : codeArr[codeArr[instructionPointer + 1]];
+            int b = op.Param2Immediate ? codeArr[instructionPointer + 2] : codeArr[codeArr[instructionPointer + 2]];
+            int o = op.Param3Immediate ? instructionPointer + 3 : codeArr[instructionPointer + 3];
+
+            codeArr[o] = a + b;
+        }
+
+        public void Multiply(int[] codeArr, int instructionPointer, Operation op)
+        {
+            int a = op.Param1Immediate ? codeArr[instructionPointer + 1] : codeArr[codeArr[instructionPointer + 1]];
+            int b = op.Param2Immediate ? codeArr[instructionPointer + 2] : codeArr[codeArr[instructionPointer + 2]];
+            int o = op.Param3Immediate ? instructionPointer + 3 : codeArr[instructionPointer + 3];
+
+            codeArr[o] = a * b;
+        }
+
+        public void Input(int[] codeArr, int nounPointer, int input, Operation op)
+        {
+            int dest = op.Param1Immediate ? nounPointer : codeArr[nounPointer];
+
+            codeArr[dest] = input;
+        }
+
+        public int Output(int[] codeArr, int nounPointer, Operation op)
+        {
+            int source = op.Param1Immediate ? nounPointer : codeArr[nounPointer];
+
+            return codeArr[source];
         }
 
         private bool CheckValid(int[] input, int instructionPointer, int nounPointer, int verbPointer, int outPointer)
