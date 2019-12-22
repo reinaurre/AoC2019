@@ -7,9 +7,9 @@ namespace WireManagement
 {
     public class Intersection : Coordinate
     {
+        public bool isSelfIntersection { get; private set; }
         public int LengthA;
         public int LengthB;
-        public bool isSelfIntersection;
         public int ManhattanDistance;
 
         /// <summary>

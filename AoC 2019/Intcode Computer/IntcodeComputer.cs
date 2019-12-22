@@ -6,125 +6,250 @@ namespace Intcode_Computer
 {
     public class IntcodeComputer
     {
-        private const string ACTION_NOUN = "noun";
-        private const string ACTION_VERB = "verb";
-        private const string ACTION_OPCODE = "opcode";
-        private const string ACTION_OUTPOINTER = "outPointer";
-        private const string ERROR_MESSAGE = "ERROR: {0} pointer value {1} is larger than input length {2}!";
+        public int OutputValue = int.MinValue;
+        public Opcodes LatestOpcode;
 
-        public string ComputeIntcode(string codeArr, int input = int.MaxValue)
+        private int[] Intcode;
+        private int Pointer = 0;
+        private int InputPointer = 0;
+
+        public IntcodeComputer(int[] intcode)
         {
-            // convert to int array
-            int[] intcodeArray = codeArr.ConvertToIntArray();
+            this.Intcode = intcode;
+        }
+
+        public IntcodeComputer(string intcodeStr)
+        {
+            this.Intcode = intcodeStr.ConvertToIntArray();
+        }
+
+        public string ComputeIntcodeToString(int input = int.MaxValue)
+        {
+            int[] inputs = new int[1] { input };
 
             // compute!
-            intcodeArray = this.Compute(intcodeArray, input);
+            this.ExecuteOperations(inputs);
 
-            return intcodeArray.ConvertToIntcodeString();
+            return this.Intcode.ConvertToIntcodeString();
         }
 
-        public int[] ComputeIntcode(int[] codeArr, int input = int.MaxValue)
+        public string ComputeIntcodeToString(int[] inputVals)
         {
-            return this.Compute(codeArr, input);
+            // compute!
+            this.ExecuteOperations(inputVals);
+
+            return this.Intcode.ConvertToIntcodeString();
         }
 
-        private int[] Compute(int[] codeArr, int input)
+        public int[] ComputeIntcode(int input = int.MaxValue)
         {
-            int pointer = 0;
-            List<int> output = new List<int>();
+            int[] inputs = new int[1] { input };
+            this.ExecuteOperations(inputs);
+            return this.Intcode;
+        }
 
-            while (pointer + 1 < codeArr.Length)
+        public int[] ComputeIntcode(int[] inputVals, bool stopOnOutput = false)
+        {
+            this.ExecuteOperations(inputVals, stopOnOutput);
+            return this.Intcode;
+        }
+
+        public int ExecuteOperations(int[] inputs, bool stopOnOutput = false)
+        {
+            this.LatestOpcode = Opcodes.Zero;
+            this.InputPointer = this.Pointer == 0 ? 0 : 1;
+
+            while(this.Pointer < this.Intcode.Length && this.LatestOpcode != Opcodes.Terminate)
             {
-                Operation op = new Operation(codeArr[pointer]);
+                int operationOutput = this.InputPointer >= inputs.Length 
+                    ? this.Compute() 
+                    : this.Compute(inputs[this.InputPointer]);
 
-                switch (op.Opcode)
+                if (operationOutput != int.MinValue && operationOutput != 0)
                 {
-                    case Opcodes.Add:
-                        this.Add(codeArr, pointer, op);
-                        break;
-                    case Opcodes.Multiply:
-                        this.Multiply(codeArr, pointer, op);
-                        break;
-                    case Opcodes.Input:
-                        this.Input(codeArr, pointer + 1, input, op);
-                        break;
-                    case Opcodes.Output:
-                        output.Add(this.Output(codeArr, pointer + 1, op));
-                        break;
-                    case Opcodes.Terminate:
-                        if (output.Count > 0)
-                        {
-                            return output.ToArray();
-                        }
-                        return codeArr;
+                    this.OutputValue = operationOutput;
+                    
+                    if (stopOnOutput)
+                    {
+                        return this.OutputValue;
+                    }
                 }
-
-                pointer += op.Length;
             }
 
-            if(output.Count > 0)
-            {
-                return output.ToArray();
-            }
-
-            return codeArr;
+            return this.OutputValue;
         }
 
-        public void Add(int[] codeArr, int instructionPointer, Operation op)
+        public int Compute(int input = int.MaxValue)
         {
-            int a = op.Param1Immediate ? codeArr[instructionPointer + 1] : codeArr[codeArr[instructionPointer + 1]];
-            int b = op.Param2Immediate ? codeArr[instructionPointer + 2] : codeArr[codeArr[instructionPointer + 2]];
-            int o = op.Param3Immediate ? instructionPointer + 3 : codeArr[instructionPointer + 3];
+            Operation op = new Operation(this.Intcode[this.Pointer]);
+            this.LatestOpcode = op.Opcode;
+            int output = int.MinValue;
+            bool skipIncrement = false;
 
-            codeArr[o] = a + b;
-        }
-
-        public void Multiply(int[] codeArr, int instructionPointer, Operation op)
-        {
-            int a = op.Param1Immediate ? codeArr[instructionPointer + 1] : codeArr[codeArr[instructionPointer + 1]];
-            int b = op.Param2Immediate ? codeArr[instructionPointer + 2] : codeArr[codeArr[instructionPointer + 2]];
-            int o = op.Param3Immediate ? instructionPointer + 3 : codeArr[instructionPointer + 3];
-
-            codeArr[o] = a * b;
-        }
-
-        public void Input(int[] codeArr, int nounPointer, int input, Operation op)
-        {
-            int dest = op.Param1Immediate ? nounPointer : codeArr[nounPointer];
-
-            codeArr[dest] = input;
-        }
-
-        public int Output(int[] codeArr, int nounPointer, Operation op)
-        {
-            int source = op.Param1Immediate ? nounPointer : codeArr[nounPointer];
-
-            return codeArr[source];
-        }
-
-        private bool CheckValid(int[] input, int instructionPointer, int nounPointer, int verbPointer, int outPointer)
-        {
-            if (input[instructionPointer] >= input.Length)
+            switch (op.Opcode)
             {
-                throw new ArgumentOutOfRangeException($"{ACTION_OPCODE} pointer", String.Format(ERROR_MESSAGE, ACTION_OPCODE, input[instructionPointer], input.Length));
+                case Opcodes.Add:
+                    this.Add(op);
+                    break;
+                case Opcodes.Multiply:
+                    this.Multiply(op);
+                    break;
+                case Opcodes.Input:
+                    this.Input(input, op);
+                    this.InputPointer++;
+                    break;
+                case Opcodes.Output:
+                    output = this.Output(op);
+                    break;
+                case Opcodes.JumpIfTrue:
+                    skipIncrement = this.JumpIfTrue(op);
+                    break;
+                case Opcodes.JumpIfFalse:
+                    skipIncrement = this.JumpIfFalse(op);
+                    break;
+                case Opcodes.LessThan:
+                    this.LessThan(op);
+                    break;
+                case Opcodes.Equals:
+                    this.Equals(op);
+                    break;
+                case Opcodes.Terminate:
+                    return output;
             }
 
-            if (input[nounPointer] >= input.Length)
+            if (!skipIncrement)
             {
-                throw new ArgumentOutOfRangeException($"{ACTION_NOUN} pointer", String.Format(ERROR_MESSAGE, ACTION_NOUN, input[nounPointer], input.Length));
+                this.Pointer += op.Length;
             }
 
-            if (input[verbPointer] >= input.Length)
+            return output;
+        }
+
+        public void Reset()
+        {
+
+        }
+
+        private void Add(Operation op)
+        {
+            int a = op.Param1Immediate
+                ? this.CheckValid(this.Intcode, this.Pointer + 1, "Add Noun")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "Add Noun");
+            int b = op.Param2Immediate
+                ? this.CheckValid(this.Intcode, this.Pointer + 2, "Add Verb")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "Add Verb");
+            int o = op.Param3Immediate
+                ? this.Pointer + 3 // oops, no check for this one
+                : this.CheckValid(this.Intcode, this.Pointer + 3, "Add Output");
+
+            this.Intcode[o] = a + b;
+        }
+
+        private void Multiply(Operation op)
+        {
+            int a = op.Param1Immediate 
+                ? this.CheckValid(this.Intcode, this.Pointer + 1, "Multiply Noun")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "Multiply Noun");
+            int b = op.Param2Immediate 
+                ? this.CheckValid(this.Intcode, this.Pointer + 2, "Multiply Verb")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "Multiply Verb");
+            int o = op.Param3Immediate 
+                ? this.Pointer + 3 // oops, no check for this one
+                : this.CheckValid(this.Intcode, this.Pointer + 3, "Multiply Output");
+
+            this.Intcode[o] = a * b;
+        }
+
+        private void Input(int input, Operation op)
+        {
+            int dest = op.Param1Immediate
+                ? this.Pointer + 1
+                : this.CheckValid(this.Intcode, this.Pointer + 1, "Input Noun");
+
+            this.Intcode[dest] = input;
+        }
+
+        private int Output(Operation op)
+        {
+            int source = op.Param1Immediate
+                ? this.Pointer + 1
+                : this.CheckValid(this.Intcode, this.Pointer + 1, "Output Noun");
+
+            return this.Intcode[source];
+        }
+
+        private bool JumpIfTrue(Operation op)
+        {
+            int a = op.Param1Immediate 
+                ? this.CheckValid(this.Intcode, this.Pointer + 1, "JumpIfTrue Noun")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "JumpIfTrue Noun");
+
+            if(a != 0)
             {
-                throw new ArgumentOutOfRangeException($"{ACTION_VERB} pointer", String.Format(ERROR_MESSAGE, ACTION_VERB, input[verbPointer], input.Length));
+                this.Pointer = op.Param2Immediate 
+                    ? this.CheckValid(this.Intcode, this.Pointer + 2, "JumpIfTrue Verb")
+                    : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "JumpIfTrue Verb");
+                return true;
             }
 
-            if (input[outPointer] >= input.Length)
+            return false;
+        }
+
+        private bool JumpIfFalse(Operation op)
+        {
+            int a = op.Param1Immediate
+                ? this.CheckValid(this.Intcode, this.Pointer + 1, "JumpIfFalse Noun")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "JumpIfFalse Noun");
+
+            if (a == 0)
             {
-                throw new ArgumentOutOfRangeException($"{ACTION_OUTPOINTER} pointer", String.Format(ERROR_MESSAGE, ACTION_OUTPOINTER, input[outPointer], input.Length));
+                this.Pointer = op.Param2Immediate
+                    ? this.CheckValid(this.Intcode, this.Pointer + 2, "JumpIfFalse Verb")
+                    : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "JumpIfFalse Verb");
+                return true;
             }
 
-            return true;
+            return false;
+        }
+
+        private void LessThan(Operation op)
+        {
+            int a = op.Param1Immediate
+                ? this.CheckValid(this.Intcode, this.Pointer + 1, "LessThan Noun")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "LessThan Noun");
+            int b = op.Param2Immediate
+                ? this.CheckValid(this.Intcode, this.Pointer + 2, "LessThan Verb")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "LessThan Verb");
+            int o = op.Param3Immediate
+                ? this.Pointer + 3 // oops, no check for this one
+                : this.CheckValid(this.Intcode, this.Pointer + 3, "LessThan Output");
+
+            this.Intcode[o] = a < b ? 1 : 0;
+        }
+
+        private void Equals(Operation op)
+        {
+            int a = op.Param1Immediate
+                ? this.CheckValid(this.Intcode, this.Pointer + 1, "Equals Noun")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "Equals Noun");
+            int b = op.Param2Immediate
+                ? this.CheckValid(this.Intcode, this.Pointer + 2, "Equals Verb")
+                : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "Equals Verb");
+            int o = op.Param3Immediate
+                ? this.Pointer + 3 // oops, no check for this one
+                : this.CheckValid(this.Intcode, this.Pointer + 3, "Equals Output");
+
+            this.Intcode[o] = a == b ? 1 : 0;
+        }
+
+        private int CheckValid(int[] input, int pointer, string name)
+        {
+            if(pointer >= input.Length)
+            {
+                throw new ArgumentOutOfRangeException($"{name} pointer", $"ERROR: {name} pointer {pointer} is larger than array length {input.Length}!");
+            }
+
+            return input[pointer];
         }
     }
 

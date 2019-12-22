@@ -6,8 +6,8 @@ namespace WireManagement
 {
     public class Command
     {
-        public Direction Direction;
-        public int Distance;
+        public Direction Direction { get; private set; }
+        public int Distance { get; private set; }
 
         public Command(Direction direction, int distance)
         {
