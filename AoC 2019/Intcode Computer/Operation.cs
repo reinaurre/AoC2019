@@ -14,20 +14,38 @@ namespace Intcode_Computer
             { Opcodes.JumpIfFalse, 3 },
             { Opcodes.LessThan, 4 },
             { Opcodes.Equals, 4 },
+            {Opcodes.AdjustBase, 2 },
             { Opcodes.Terminate, 1 }
         };
 
         public Opcodes Opcode { get; private set; }
         public int Length;
-        public bool Param1Immediate { get; private set; }
-        public bool Param2Immediate { get; private set; }
-        public bool Param3Immediate { get; private set; }
+        public Modes Param1Mode { get; private set; }
+        public Modes Param2Mode { get; private set; }
+        public Modes Param3Mode { get; private set; }
 
-        public Operation(int instruction)
+        public Operation(long instruction)
         {
-            this.Param1Immediate = this.GetValueAtPosition(instruction, 100) == 1 ? true : false;
-            this.Param2Immediate = this.GetValueAtPosition(instruction, 1000) == 1 ? true : false;
-            this.Param3Immediate = this.GetValueAtPosition(instruction, 10000) == 1 ? true : false;
+            switch (this.GetValueAtPosition(instruction, 100))
+            {
+                case 0: this.Param1Mode = Modes.Position; break;
+                case 1: this.Param1Mode = Modes.Immediate; break;
+                case 2: this.Param1Mode = Modes.Relative; break;
+            }
+
+            switch (this.GetValueAtPosition(instruction, 1000))
+            {
+                case 0: this.Param2Mode = Modes.Position; break;
+                case 1: this.Param2Mode = Modes.Immediate; break;
+                case 2: this.Param2Mode = Modes.Relative; break;
+            }
+
+            switch (this.GetValueAtPosition(instruction, 10000))
+            {
+                case 0: this.Param3Mode = Modes.Position; break;
+                case 1: this.Param3Mode = Modes.Immediate; break;
+                case 2: this.Param3Mode = Modes.Relative; break;
+            }
 
             int opcode = (this.GetValueAtPosition(instruction, 10) * 10) + this.GetValueAtPosition(instruction, 1);
 
@@ -65,6 +83,10 @@ namespace Intcode_Computer
                     this.Opcode = Opcodes.Equals;
                     this.Length = this.OperationLengths[this.Opcode];
                     break;
+                case (int)Opcodes.AdjustBase:
+                    this.Opcode = Opcodes.AdjustBase;
+                    this.Length = this.OperationLengths[this.Opcode];
+                    break;
                 case (int)Opcodes.Terminate:
                     this.Opcode = Opcodes.Terminate;
                     this.Length = 1;
@@ -74,10 +96,17 @@ namespace Intcode_Computer
             }
         }
 
-        private int GetValueAtPosition(int value, int position)
+        private int GetValueAtPosition(long value, long position)
         {
-            return (value % (position * 10) - value % position) / position;
+            return (int)((value % (position * 10) - value % position) / position);
         }
+    }
+
+    public enum Modes
+    {
+        Position = 0,
+        Immediate = 1,
+        Relative = 2
     }
 
     public enum Opcodes
@@ -91,6 +120,7 @@ namespace Intcode_Computer
         JumpIfFalse = 6, // if the 1st parameter is zero, set the instruction pointer to the value from the 2nd parameter.
         LessThan = 7, // if the 1st parameter is less than the 2nd parameter, store 1 in in the position given by the 3rd parameter, otherwise store 0.
         Equals = 8, // if the 1st parameter is equal to the 2nd parameter, store 1 in the position given by the 3rd parameter, otherwise store 0.
+        AdjustBase = 9, // adjusts the relative base by the value of its only parameter.
         Terminate = 99
     }
 }

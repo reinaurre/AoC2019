@@ -8,11 +8,22 @@
   <ItemGroup>
     <ProjectReference Include="..\CodeCracker\CodeCracker.csproj" />
     <ProjectReference Include="..\Intcode Computer\Intcode Computer.csproj" />
+    <ProjectReference Include="..\MonitoringStation\MonitoringStation.csproj" />
     <ProjectReference Include="..\OrbitalCalculator\OrbitalCalculator.csproj" />
+    <ProjectReference Include="..\SpaceImageFormat\SpaceImageFormat.csproj" />
     <ProjectReference Include="..\WireManagement\WireManagement.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Day10\OfficialInput.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day10\Part1Test2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day10\Part1Test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Day2\OriginalInput.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -59,6 +70,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Day7\Part1Test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day8\OfficialInput.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day8\Part2Test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day8\Part1Test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day9\OfficialInput.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day9\Part1Test.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

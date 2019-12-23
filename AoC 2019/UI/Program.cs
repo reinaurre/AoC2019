@@ -2,7 +2,9 @@
 using System.IO;
 using CodeCracker;
 using Intcode_Computer;
+using MonitoringStation;
 using OrbitalCalculator;
+using SpaceImageFormat;
 using WireManagement;
 
 namespace UI
@@ -55,9 +57,29 @@ namespace UI
             //Console.WriteLine("Day 7 Part 1:");
             //Day7Part1();
 
+            //Console.WriteLine();
+            //Console.WriteLine("Day 7 Part 2:");
+            //Day7Part2();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 8 Part 1:");
+            //Day8Part1();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 8 Part 2:");
+            //Day8Part2();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 9 Part 1:");
+            //Day9Part1();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 9 Part 2:");
+            //Day9Part2();
+
             Console.WriteLine();
-            Console.WriteLine("Day 7 Part 2:");
-            Day7Part2();
+            Console.WriteLine("Day 10 Part 1:");
+            Day10Part1();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -106,7 +128,7 @@ namespace UI
                     Console.WriteLine($"Computing line {counter}:");
 
                     // convert to int array
-                    int[] intcodeArray = str.ConvertToIntArray();
+                    long[] intcodeArray = str.ConvertToLongArray();
 
                     for (int noun = 0; noun <= 99; noun++)
                     {
@@ -116,7 +138,7 @@ namespace UI
                             {
                                 if (!isFound)
                                 {
-                                    int[] testIntcode = (int[])intcodeArray.Clone();
+                                    long[] testIntcode = (long[])intcodeArray.Clone();
                                     testIntcode[1] = noun;
                                     testIntcode[2] = verb;
 
@@ -306,7 +328,7 @@ namespace UI
             int counter = 0;
             foreach (string str in lines)
             {
-                int maxvalue = 0;
+                long maxvalue = 0;
 
                 // HAHAHAHA THIS IS FUCKING GROSS
                 for(int a = 0; a < 5; a++)
@@ -333,25 +355,25 @@ namespace UI
                                                     IntcodeComputer IC4 = new IntcodeComputer(str);
                                                     IntcodeComputer IC5 = new IntcodeComputer(str);
 
-                                                    int[] inputVals = new int[2] { a, 0 };
+                                                    long[] inputVals = new long[2] { a, 0 };
                                                     IC1.ComputeIntcode(inputVals);
-                                                    inputVals[1] = IC1.OutputValue;
+                                                    inputVals[1] = IC1.OutputValue[IC1.OutputValue.Count - 1];
 
                                                     inputVals[0] = b;
                                                     IC2.ComputeIntcode(inputVals);
-                                                    inputVals[1] = IC2.OutputValue;
+                                                    inputVals[1] = IC2.OutputValue[IC2.OutputValue.Count - 1];
 
                                                     inputVals[0] = c;
                                                     IC3.ComputeIntcode(inputVals);
-                                                    inputVals[1] = IC3.OutputValue;
+                                                    inputVals[1] = IC3.OutputValue[IC3.OutputValue.Count - 1];
 
                                                     inputVals[0] = d;
                                                     IC4.ComputeIntcode(inputVals);
-                                                    inputVals[1] = IC4.OutputValue;
+                                                    inputVals[1] = IC4.OutputValue[IC4.OutputValue.Count - 1];
 
                                                     inputVals[0] = e;
                                                     IC5.ComputeIntcode(inputVals);
-                                                    inputVals[1] = IC5.OutputValue;
+                                                    inputVals[1] = IC5.OutputValue[IC5.OutputValue.Count - 1];
 
                                                     if (inputVals[1] > maxvalue)
                                                     {
@@ -385,7 +407,7 @@ namespace UI
             int counter = 0;
             foreach (string str in lines)
             {
-                int maxvalue = 0;
+                long maxvalue = 0;
 
                 // HAHAHAHA THIS IS FUCKING GROSS
                 for (int a = 5; a <= 9; a++)
@@ -406,7 +428,7 @@ namespace UI
                                             {
                                                 if (e != a && e != b && e != c && e != d)
                                                 {
-                                                    int[] inputVals = new int[2] { a, 0 };
+                                                    long[] inputVals = new long[2] { a, 0 };
 
                                                     IntcodeComputer IC1 = new IntcodeComputer(str);
                                                     IntcodeComputer IC2 = new IntcodeComputer(str);
@@ -418,23 +440,23 @@ namespace UI
                                                     {
                                                         inputVals[0] = a;
                                                         IC1.ComputeIntcode(inputVals, true);
-                                                        inputVals[1] = IC1.OutputValue;
+                                                        inputVals[1] = IC1.OutputValue[IC1.OutputValue.Count - 1];
 
                                                         inputVals[0] = b;
                                                         IC2.ComputeIntcode(inputVals, true);
-                                                        inputVals[1] = IC2.OutputValue;
+                                                        inputVals[1] = IC2.OutputValue[IC2.OutputValue.Count - 1];
 
                                                         inputVals[0] = c;
                                                         IC3.ComputeIntcode(inputVals, true);
-                                                        inputVals[1] = IC3.OutputValue;
+                                                        inputVals[1] = IC3.OutputValue[IC3.OutputValue.Count - 1];
 
                                                         inputVals[0] = d;
                                                         IC4.ComputeIntcode(inputVals, true);
-                                                        inputVals[1] = IC4.OutputValue;
+                                                        inputVals[1] = IC4.OutputValue[IC4.OutputValue.Count - 1];
 
                                                         inputVals[0] = e;
                                                         IC5.ComputeIntcode(inputVals, true);
-                                                        inputVals[1] = IC5.OutputValue;
+                                                        inputVals[1] = IC5.OutputValue[IC5.OutputValue.Count - 1];
                                                     }
 
                                                     if (inputVals[1] > maxvalue)
@@ -455,6 +477,170 @@ namespace UI
                 Console.WriteLine(maxvalue);
 
                 counter++;
+            }
+        }
+
+        public static void Day8Part1()
+        {
+            string fileName = "Day8/OfficialInput.txt"; // answer is 2460
+            //string fileName = "Day8/Part1Test.txt"; // answer is 1
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            int counter = 0;
+            foreach (string str in lines)
+            {
+                int x = 25;
+                int y = 6;
+
+                if (fileName.Contains("Test"))
+                {
+                    x = 3;
+                    y = 2;
+                }
+
+                SIFDecoder SD = new SIFDecoder(x, y, str);
+
+                int output = SD.FindLayerForPart1();
+
+                Console.WriteLine("Output:");
+                Console.WriteLine(output);
+
+                counter++;
+            }
+        }
+
+        public static void Day8Part2()
+        {
+            string fileName = "Day8/OfficialInput.txt"; // answer is 
+            //string fileName = "Day8/Part2Test.txt"; // answer is 01,10
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            int counter = 0;
+            foreach (string str in lines)
+            {
+                int x = 25;
+                int y = 6;
+
+                if (fileName.Contains("Test"))
+                {
+                    x = 2;
+                    y = 2;
+                }
+
+                SIFDecoder SD = new SIFDecoder(x, y, str);
+
+                int[,] output = SD.DecodeImage();
+
+                for(int row = 0; row < output.GetLength(1); row++)
+                {
+                    for(int col = 0; col < output.GetLength(0); col++)
+                    {
+                        if (output[col, row] == 0)
+                        {
+                            Console.Write('.');
+                        }
+                        else
+                        {
+                            Console.Write(output[col, row]);
+                        }
+                    }
+                    Console.WriteLine();
+                }
+
+                counter++;
+            }
+        }
+
+        public static void Day9Part1()
+        {
+            string fileName = "Day9/OfficialInput.txt";
+            //string fileName = "Day9/Part1Test.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            int counter = 0;
+            foreach (string str in lines)
+            {
+                long inputVal = 1;
+                if (fileName.Contains("Test"))
+                {
+                    Console.Write("Enter Input Value: ");
+                    string inputStr = Console.ReadLine();
+                    inputVal = Convert.ToInt32(inputStr);
+                }
+                IntcodeComputer IC = new IntcodeComputer(str);
+
+                long[] inputVals = new long[] { inputVal };
+
+                string output = IC.ExecuteOperations(inputVals).ConvertToIntcodeString();
+
+                Console.WriteLine("Intcode Output:");
+                Console.WriteLine(output);
+
+                counter++;
+            }
+        }
+
+        public static void Day9Part2()
+        {
+            string fileName = "Day9/OfficialInput.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            int counter = 0;
+            foreach (string str in lines)
+            {
+                long inputVal = 2;
+                IntcodeComputer IC = new IntcodeComputer(str);
+                long[] inputVals = new long[] { inputVal };
+
+                string output = IC.ExecuteOperations(inputVals).ConvertToIntcodeString();
+
+                Console.WriteLine("Intcode Output:");
+                Console.WriteLine(output);
+
+                counter++;
+            }
+        }
+
+        public static void Day10Part1()
+        {
+            //string fileName = "Day10/OfficialInput.txt";
+            //string fileName = "Day10/Part1Test.txt"; // answer = 8 at 3,4
+            string fileName = "Day10/Part1Test2.txt"; // answer = 33 at 5,8 *** I'm getting 32 at 8,0 ***
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            LineOfSightCalculator LOSC = new LineOfSightCalculator();
+            LOSC.BuildGrid(lines);
+
+            for (int y = 0; y < LOSC.Grid.GetLength(1); y++)
+            {
+                for (int x = 0; x < LOSC.Grid.GetLength(0); x++)
+                {
+                    Console.Write(LOSC.Grid[x, y]);
+                }
+                Console.WriteLine();
+            }
+
+            int output = LOSC.FindMostAsteroidsDetected();
+
+            Console.WriteLine("Most Asteroids Detected:");
+            Console.WriteLine(output);
+            Console.WriteLine("At position:");
+            Console.WriteLine($"{LOSC.MonitoringStation.Coordinate.X},{LOSC.MonitoringStation.Coordinate.Y}");
+
+            Console.WriteLine();
+            foreach(Asteroid ast in LOSC.MonitoringStation.AsteroidsDetected)
+            {
+                Console.WriteLine($"{ast.Coordinate.X},{ast.Coordinate.Y}");
             }
         }
 
