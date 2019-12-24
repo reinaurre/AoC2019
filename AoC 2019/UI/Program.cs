@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using CodeCracker;
 using Intcode_Computer;
 using MonitoringStation;
@@ -612,8 +613,11 @@ namespace UI
         public static void Day10Part1()
         {
             //string fileName = "Day10/OfficialInput.txt";
-            //string fileName = "Day10/Part1Test.txt"; // answer = 8 at 3,4
-            string fileName = "Day10/Part1Test2.txt"; // answer = 33 at 5,8 *** I'm getting 32 at 8,0 ***
+            //string fileName = "Day10/Part1Test.txt"; // answer = 8 at 3,4 -pass
+            //string fileName = "Day10/Part1Test2.txt"; // answer = 33 at 5,8 -pass
+            //string fileName = "Day10/Part1Test3.txt"; // answer = 35 at 1,2 -pass
+            //string fileName = "Day10/Part1Test4.txt"; // answer = 41 at 6,3 -pass
+            string fileName = "Day10/Part1Test5.txt"; // answer = 210 at 11,13 *** I get 215 at 11,13 *** ■
 
             Console.WriteLine("Parsing Input...");
             string[] lines = File.ReadAllLines(fileName);
@@ -625,7 +629,7 @@ namespace UI
             {
                 for (int x = 0; x < LOSC.Grid.GetLength(0); x++)
                 {
-                    Console.Write(LOSC.Grid[x, y]);
+                    Console.Write($"{LOSC.Grid[x, y]} ");
                 }
                 Console.WriteLine();
             }
@@ -636,6 +640,32 @@ namespace UI
             Console.WriteLine(output);
             Console.WriteLine("At position:");
             Console.WriteLine($"{LOSC.MonitoringStation.Coordinate.X},{LOSC.MonitoringStation.Coordinate.Y}");
+
+            Console.WriteLine();
+            for (int y = 0; y < LOSC.Grid.GetLength(1); y++)
+            {
+                for (int x = 0; x < LOSC.Grid.GetLength(0); x++)
+                {
+                    if (LOSC.MonitoringStation.Coordinate.X == x && LOSC.MonitoringStation.Coordinate.Y == y)
+                    {
+                        Console.Write("Ø ");
+                    }
+                    else if (LOSC.MonitoringStation.AsteroidsDetected.Count(a => a.Coordinate.X == x && a.Coordinate.Y == y) > 0)
+                    {
+                        Console.Write("× "); // ø ■ ¤
+                    }
+                    else if(LOSC.Grid[x,y] == '#')
+                    {
+                        Console.Write("■ ");
+                    }
+                    else
+                    {
+                        Console.Write(". ");
+                    }
+                }
+                Console.WriteLine();
+            }
+
 
             Console.WriteLine();
             foreach(Asteroid ast in LOSC.MonitoringStation.AsteroidsDetected)
