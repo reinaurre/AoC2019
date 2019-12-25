@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Intcode Computer\Intcode Computer.csproj" />
     <ProjectReference Include="..\MonitoringStation\MonitoringStation.csproj" />
     <ProjectReference Include="..\OrbitalCalculator\OrbitalCalculator.csproj" />
+    <ProjectReference Include="..\PaintingRobot\PaintingRobot.csproj" />
     <ProjectReference Include="..\SpaceImageFormat\SpaceImageFormat.csproj" />
     <ProjectReference Include="..\WireManagement\WireManagement.csproj" />
   </ItemGroup>
@@ -31,6 +32,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Day10\Part1Test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day11\OfficialInput.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day11\Part1Test.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Day2\OriginalInput.txt">

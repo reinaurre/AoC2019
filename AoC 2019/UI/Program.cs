@@ -5,6 +5,7 @@ using CodeCracker;
 using Intcode_Computer;
 using MonitoringStation;
 using OrbitalCalculator;
+using PaintingRobot;
 using SpaceImageFormat;
 using WireManagement;
 
@@ -78,9 +79,21 @@ namespace UI
             //Console.WriteLine("Day 9 Part 2:");
             //Day9Part2();
 
+            //Console.WriteLine();
+            //Console.WriteLine("Day 10 Part 1:");
+            //Day10Part1();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 10 Part 2:");
+            //Day10Part2();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 11 Part 1:");
+            //Day11Part1();
+
             Console.WriteLine();
-            Console.WriteLine("Day 10 Part 1:");
-            Day10Part1();
+            Console.WriteLine("Day 11 Part 2:");
+            Day11Part2();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -612,49 +625,146 @@ namespace UI
 
         public static void Day10Part1()
         {
-            //string fileName = "Day10/OfficialInput.txt";
+            string fileName = "Day10/OfficialInput.txt";
             //string fileName = "Day10/Part1Test.txt"; // answer = 8 at 3,4 -pass
             //string fileName = "Day10/Part1Test2.txt"; // answer = 33 at 5,8 -pass
             //string fileName = "Day10/Part1Test3.txt"; // answer = 35 at 1,2 -pass
             //string fileName = "Day10/Part1Test4.txt"; // answer = 41 at 6,3 -pass
-            string fileName = "Day10/Part1Test5.txt"; // answer = 210 at 11,13 *** I get 215 at 11,13 *** ■
+            //string fileName = "Day10/Part1Test5.txt"; // answer = 210 at 11,13
 
             Console.WriteLine("Parsing Input...");
             string[] lines = File.ReadAllLines(fileName);
 
-            LineOfSightCalculator LOSC = new LineOfSightCalculator();
-            LOSC.BuildGrid(lines);
+            MonitoringStationManager MSM = new MonitoringStationManager();
+            MSM.BuildGrid(lines);
 
-            for (int y = 0; y < LOSC.Grid.GetLength(1); y++)
+            for (int y = 0; y < MSM.Grid.GetLength(1); y++)
             {
-                for (int x = 0; x < LOSC.Grid.GetLength(0); x++)
+                for (int x = 0; x < MSM.Grid.GetLength(0); x++)
                 {
-                    Console.Write($"{LOSC.Grid[x, y]} ");
+                    Console.Write($"{MSM.Grid[x, y]} ");
                 }
                 Console.WriteLine();
             }
 
-            int output = LOSC.FindMostAsteroidsDetected();
+            int output = MSM.SetMonitoringStationLocation();
 
             Console.WriteLine("Most Asteroids Detected:");
             Console.WriteLine(output);
             Console.WriteLine("At position:");
-            Console.WriteLine($"{LOSC.MonitoringStation.Coordinate.X},{LOSC.MonitoringStation.Coordinate.Y}");
+            Console.WriteLine($"{MSM.MonitoringStation.Coordinate.X},{MSM.MonitoringStation.Coordinate.Y}");
 
             Console.WriteLine();
-            for (int y = 0; y < LOSC.Grid.GetLength(1); y++)
+            DisplayAsteroidMap(MSM);
+        }
+
+        public static void Day10Part2()
+        {
+            string fileName = "Day10/OfficialInput.txt";
+            //string fileName = "Day10/Part1Test.txt"; // answer = 8 at 3,4 -pass
+            //string fileName = "Day10/Part1Test2.txt"; // answer = 33 at 5,8 -pass
+            //string fileName = "Day10/Part1Test3.txt"; // answer = 35 at 1,2 -pass
+            //string fileName = "Day10/Part1Test4.txt"; // answer = 41 at 6,3 -pass
+            //string fileName = "Day10/Part1Test5.txt"; // answer = 210 at 11,13
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            MonitoringStationManager MSM = new MonitoringStationManager();
+            MSM.BuildGrid(lines);
+
+            for (int y = 0; y < MSM.Grid.GetLength(1); y++)
             {
-                for (int x = 0; x < LOSC.Grid.GetLength(0); x++)
+                for (int x = 0; x < MSM.Grid.GetLength(0); x++)
                 {
-                    if (LOSC.MonitoringStation.Coordinate.X == x && LOSC.MonitoringStation.Coordinate.Y == y)
+                    Console.Write($"{MSM.Grid[x, y]} ");
+                }
+                Console.WriteLine();
+            }
+
+            int output = MSM.SetMonitoringStationLocation();
+
+            Console.WriteLine("Most Asteroids Detected:");
+            Console.WriteLine(output);
+            Console.WriteLine("At position:");
+            Console.WriteLine($"{MSM.MonitoringStation.Coordinate.X},{MSM.MonitoringStation.Coordinate.Y}");
+            Console.WriteLine();
+            DisplayAsteroidMap(MSM);
+
+            MSM.InitializeLaser();
+
+            for(int i = 1; i <= 200; i++)
+            {
+                Console.WriteLine("FIRE!");
+                Coordinate destroyed = MSM.FireLaser();
+                Console.WriteLine();
+                DisplayAsteroidMap(MSM);
+                Console.WriteLine($"Asteroid {i} destroyed is at {destroyed.X},{destroyed.Y}");
+            }
+        }
+
+        public static void Day11Part1()
+        {
+            string fileName = "Day11/OfficialInput.txt";
+            // string fileName = "Day11/Part1Test.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            int counter = 0;
+            foreach (string str in lines)
+            {
+                RobotController RC = new RobotController(0, 0, str);
+                RC.ExecutePaintingProgram();
+
+                int output = RC.PaintMap.Count;
+
+                Console.WriteLine("Number Painted:");
+                Console.WriteLine(output);
+
+                counter++;
+            }
+        }
+
+        public static void Day11Part2()
+        {
+            string fileName = "Day11/OfficialInput.txt";
+            // string fileName = "Day11/Part1Test.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            foreach (string str in lines)
+            {
+                RobotController RC = new RobotController(0, 0, str);
+                RC.ExecutePaintingProgram();
+
+                int output = RC.PaintMap.Count;
+
+                Console.WriteLine("Number Painted:");
+                Console.WriteLine(output);
+
+                MapMaker MM = new MapMaker(RC.PaintMap.Keys.ToList(),Node.Symbol.Empty);
+                MM.PopulatePaintMap(RC.PaintMap);
+                MM.PrintMap();
+            }
+        }
+
+        private static void DisplayAsteroidMap(MonitoringStationManager MSM)
+        {
+            for (int y = 0; y < MSM.Grid.GetLength(1); y++)
+            {
+                for (int x = 0; x < MSM.Grid.GetLength(0); x++)
+                {
+                    if (MSM.MonitoringStation.Coordinate.X == x && MSM.MonitoringStation.Coordinate.Y == y)
                     {
                         Console.Write("Ø ");
                     }
-                    else if (LOSC.MonitoringStation.AsteroidsDetected.Count(a => a.Coordinate.X == x && a.Coordinate.Y == y) > 0)
+                    else if (MSM.MonitoringStation.AsteroidsDetected.Count(a => a.Coordinate.X == x && a.Coordinate.Y == y) > 0)
                     {
-                        Console.Write("× "); // ø ■ ¤
+                        Console.Write("× "); // ø ■ ¤ ×
                     }
-                    else if(LOSC.Grid[x,y] == '#')
+                    else if (MSM.Grid[x, y] == '#')
                     {
                         Console.Write("■ ");
                     }
@@ -664,13 +774,6 @@ namespace UI
                     }
                 }
                 Console.WriteLine();
-            }
-
-
-            Console.WriteLine();
-            foreach(Asteroid ast in LOSC.MonitoringStation.AsteroidsDetected)
-            {
-                Console.WriteLine($"{ast.Coordinate.X},{ast.Coordinate.Y}");
             }
         }
 

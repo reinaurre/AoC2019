@@ -56,10 +56,22 @@ namespace Intcode_Computer
             return this.Intcode;
         }
 
+        public long[] ExecuteUntilOutputNumber(long[] inputs, int outputNumber)
+        {
+            this.OutputValue = new List<long>();
+
+            for(int i = 0; i < outputNumber; i++)
+            {
+                this.ExecuteOperations(inputs, true);
+            }
+
+            return this.OutputValue.ToArray();
+        }
+
         public long[] ExecuteOperations(long[] inputs, bool stopOnOutput = false)
         {
             this.LatestOpcode = Opcodes.Zero;
-            this.InputPointer = this.Pointer == 0 ? 0 : 1;
+            this.InputPointer = 0;
 
             while(this.Pointer < this.Intcode.Length && this.LatestOpcode != Opcodes.Terminate)
             {
@@ -67,7 +79,7 @@ namespace Intcode_Computer
                     ? this.Compute() 
                     : this.Compute(inputs[this.InputPointer]);
 
-                if (operationOutput != long.MinValue && operationOutput != 0)
+                if (operationOutput != long.MinValue)
                 {
                     this.OutputValue.Add(operationOutput);
                     
@@ -140,12 +152,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: a = this.CheckValid(this.Intcode, this.Pointer + 1, "Add Noun"); break;
                 case Modes.Position:
-                    a = this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "Add Noun");
                     break;
                 case Modes.Relative:
-                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 1], "Add Noun");
                     break;
@@ -155,12 +167,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: b = this.CheckValid(this.Intcode, this.Pointer + 2, "Add Verb"); break;
                 case Modes.Position:
-                    b = this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 2])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "Add Verb");
                     break;
                 case Modes.Relative:
-                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 2])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 2], "Add Verb");
                     break;
@@ -173,7 +185,7 @@ namespace Intcode_Computer
                 case Modes.Relative: o = this.RelativeBase + this.Intcode[this.Pointer + 3]; break;
             }
 
-            if (o > this.Intcode.Length)
+            if (o >= this.Intcode.Length)
             {
                 this.Memory[o] = a + b;
             }
@@ -193,12 +205,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: a = this.CheckValid(this.Intcode, this.Pointer + 1, "Multiply Noun"); break;
                 case Modes.Position:
-                    a = this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "Multiply Noun");
                     break;
                 case Modes.Relative:
-                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 1], "Multiply Noun");
                     break;
@@ -208,12 +220,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: b = this.CheckValid(this.Intcode, this.Pointer + 2, "Multiply Verb"); break;
                 case Modes.Position:
-                    b = this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 2])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "Multiply Verb");
                     break;
                 case Modes.Relative:
-                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 2])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 2], "Multiply Verb");
                     break;
@@ -226,7 +238,7 @@ namespace Intcode_Computer
                 case Modes.Relative: o = this.RelativeBase + this.Intcode[this.Pointer + 3]; break;
             }
 
-            if (o > this.Intcode.Length)
+            if (o >= this.Intcode.Length)
             {
                 this.Memory[o] = a * b;
             }
@@ -247,7 +259,7 @@ namespace Intcode_Computer
                 case Modes.Relative: dest = this.RelativeBase + this.Intcode[this.Pointer + 1]; break;
             }
 
-            if (dest > this.Intcode.Length)
+            if (dest >= this.Intcode.Length)
             {
                 this.Memory[dest] = input;
             }
@@ -268,7 +280,7 @@ namespace Intcode_Computer
                 case Modes.Relative: source = this.RelativeBase + this.Intcode[this.Pointer + 1]; break;
             }
 
-            if (source > this.Intcode.Length)
+            if (source >= this.Intcode.Length)
             {
                 return this.Memory[source];
             }
@@ -286,12 +298,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: a = this.CheckValid(this.Intcode, this.Pointer + 1, "JumpIfTrue Noun"); break;
                 case Modes.Position:
-                    a = this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "JumpIfTrue Noun");
                     break;
                 case Modes.Relative:
-                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 1], "JumpIfTrue Noun");
                     break;
@@ -303,12 +315,12 @@ namespace Intcode_Computer
                 {
                     case Modes.Immediate: this.Pointer = this.CheckValid(this.Intcode, this.Pointer + 2, "JumpIfTrue Verb"); break;
                     case Modes.Position:
-                        this.Pointer = this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                        this.Pointer = this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "JumpIfTrue Verb");
                         break;
                     case Modes.Relative:
-                        this.Pointer = this.RelativeBase + this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                        this.Pointer = this.RelativeBase + this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 2], "JumpIfTrue Verb");
                         break;
@@ -327,12 +339,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: a = this.CheckValid(this.Intcode, this.Pointer + 1, "JumpIfFalse Noun"); break;
                 case Modes.Position:
-                    a = this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "JumpIfFalse Noun");
                     break;
                 case Modes.Relative:
-                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 1], "JumpIfFalse Noun");
                     break;
@@ -344,12 +356,12 @@ namespace Intcode_Computer
                 {
                     case Modes.Immediate: this.Pointer = this.CheckValid(this.Intcode, this.Pointer + 2, "JumpIfFalse Verb"); break;
                     case Modes.Position:
-                        this.Pointer = this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                        this.Pointer = this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "JumpIfFalse Verb");
                         break;
                     case Modes.Relative:
-                        this.Pointer = this.RelativeBase + this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                        this.Pointer = this.RelativeBase + this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 2], "JumpIfFalse Verb");
                         break;
@@ -370,12 +382,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: a = this.CheckValid(this.Intcode, this.Pointer + 1, "LessThan Noun"); break;
                 case Modes.Position:
-                    a = this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "LessThan Noun");
                     break;
                 case Modes.Relative:
-                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 1], "LessThan Noun");
                     break;
@@ -385,12 +397,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: b = this.CheckValid(this.Intcode, this.Pointer + 2, "LessThan Verb"); break;
                 case Modes.Position:
-                    b = this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "LessThan Verb");
                     break;
                 case Modes.Relative:
-                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 2], "LessThan Verb");
                     break;
@@ -403,7 +415,7 @@ namespace Intcode_Computer
                 case Modes.Relative: o = this.RelativeBase + this.Intcode[this.Pointer + 3]; break;
             }
 
-            if (o > this.Intcode.Length)
+            if (o >= this.Intcode.Length)
             {
                 this.Memory[o] = a < b ? 1 : 0;
             }
@@ -423,12 +435,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: a = this.CheckValid(this.Intcode, this.Pointer + 1, "Equals Noun"); break;
                 case Modes.Position:
-                    a = this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 1], "Equals Noun");
                     break;
                 case Modes.Relative:
-                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] > this.Intcode.Length
+                    a = this.RelativeBase + this.Intcode[this.Pointer + 1] >= this.Intcode.Length
                         ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 1])
                         : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 1], "Equals Noun");
                     break;
@@ -438,12 +450,12 @@ namespace Intcode_Computer
             {
                 case Modes.Immediate: b = this.CheckValid(this.Intcode, this.Pointer + 2, "Equals Verb"); break;
                 case Modes.Position:
-                    b = this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.Intcode[this.Pointer + 2], "Equals Verb");
                     break;
                 case Modes.Relative:
-                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] > this.Intcode.Length
+                    b = this.RelativeBase + this.Intcode[this.Pointer + 2] >= this.Intcode.Length
                             ? this.Memory.GetValueOrDefault(this.RelativeBase + this.Intcode[this.Pointer + 2])
                             : this.CheckValid(this.Intcode, this.RelativeBase + this.Intcode[this.Pointer + 2], "Equals Verb");
                     break;
@@ -456,7 +468,7 @@ namespace Intcode_Computer
                 case Modes.Relative: o = this.RelativeBase + this.Intcode[this.Pointer + 3]; break;
             }
 
-            if (o > this.Intcode.Length)
+            if (o >= this.Intcode.Length)
             {
                 this.Memory[o] = a == b ? 1 : 0;
             }
@@ -477,7 +489,7 @@ namespace Intcode_Computer
                 case Modes.Relative: a = this.RelativeBase + this.Intcode[this.Pointer + 1]; break;
             }
 
-            if (a > this.Intcode.Length)
+            if (a >= this.Intcode.Length)
             {
                 this.RelativeBase += this.Memory[a];
             }

@@ -5,6 +5,7 @@ namespace MonitoringStation
 {
     public class Asteroid
     {
+        public double AngleToStation { get; set; }
         public Coordinate Coordinate { get; private set; }
         public List<Asteroid> AsteroidsDetected { get; set; }
 

@@ -5,12 +5,14 @@ using WireManagement;
 
 namespace MonitoringStation
 {
-    public class LineOfSightCalculator
+    public class MonitoringStationManager
     {
         public char[,] Grid;
         public Asteroid MonitoringStation;
 
         private List<Asteroid> AsteroidList = new List<Asteroid>();
+        private double LaserAngle;
+        private int lastDestroyedIndex = -1;
 
         public void BuildGrid(string[] input)
         {
@@ -31,28 +33,100 @@ namespace MonitoringStation
             }
         }
 
-        public int FindMostAsteroidsDetected()
+        public int SetMonitoringStationLocation()
         {
-            int max = 0;
+            this.MonitoringStation = this.FindMostAsteroidsDetected();
+            return this.MonitoringStation.AsteroidsDetected.Count;
+        }
+
+        public void InitializeLaser(double startingAngle = -1.5707963267948966)
+        {
+            this.LaserAngle = startingAngle;
+            this.CalculateAsteroidAnglesToStation();
+            this.ArrangeDetectedAsteroidsByAngle();
+        }
+
+        public Coordinate FireLaser()
+        {
+            Coordinate asteroidDestroyed = this.MonitoringStation.Coordinate;
+
+            if(this.MonitoringStation.AsteroidsDetected.Count == 0)
+            {
+                this.FindLOS(this.MonitoringStation);
+            }
+
+            int index = this.GetNextTarget();
+
+            if (this.MonitoringStation.AsteroidsDetected.Count > 0)
+            {
+                asteroidDestroyed = this.MonitoringStation.AsteroidsDetected[index].Coordinate;
+                this.LaserAngle = this.MonitoringStation.AsteroidsDetected[index].AngleToStation;
+
+                this.Grid[asteroidDestroyed.X, asteroidDestroyed.Y] = '.';
+                this.MonitoringStation.AsteroidsDetected.Remove(this.MonitoringStation.AsteroidsDetected[index]);
+            }
+
+            return asteroidDestroyed;
+        }
+
+        private int GetNextTarget()
+        {
+            if(this.lastDestroyedIndex >= this.MonitoringStation.AsteroidsDetected.Count)
+            {
+                return 0;
+            }
+            else if (this.lastDestroyedIndex != -1)
+            {
+                return this.lastDestroyedIndex;
+            }
+
+            double minAngle = 99;
+            int minIndex = 0;
+
+            for(int i = 0; i < this.MonitoringStation.AsteroidsDetected.Count; i++)
+            {
+                double angle = this.MonitoringStation.AsteroidsDetected[i].AngleToStation;
+
+                if (angle >= this.LaserAngle && angle < minAngle)
+                {
+                    minAngle = angle;
+                    minIndex = i;
+                    this.lastDestroyedIndex = minIndex;
+                    return minIndex;
+                }
+            }
+
+            return minIndex;
+        }
+
+        private void CalculateAsteroidAnglesToStation()
+        {
+            foreach(Asteroid asteroid in this.MonitoringStation.AsteroidsDetected)
+            {
+                Coordinate relative = new Coordinate(asteroid.Coordinate.X - this.MonitoringStation.Coordinate.X, 
+                    asteroid.Coordinate.Y - this.MonitoringStation.Coordinate.Y);
+
+                asteroid.AngleToStation = Math.Atan2(relative.Y, relative.X);
+            }
+        }
+
+        private void ArrangeDetectedAsteroidsByAngle()
+        {
+            this.MonitoringStation.AsteroidsDetected = this.MonitoringStation.AsteroidsDetected.OrderBy(x => x.AngleToStation).ToList();
+        }
+
+        private Asteroid FindMostAsteroidsDetected()
+        {
+            Asteroid max = new Asteroid(0, 0);
             foreach (Asteroid asteroid in this.AsteroidList)
             {
                 this.FindLOS(asteroid);
 
-                //if (asteroid.Coordinate.X == 3 && asteroid.Coordinate.Y == 4)
-                //{
-                //    this.MonitoringStation = asteroid;
-                //    max = asteroid.AsteroidsDetected.Count;
-                //}
-
-                if (asteroid.AsteroidsDetected.Count > max)
+                if (asteroid.AsteroidsDetected.Count > max.AsteroidsDetected.Count)
                 {
-                    this.MonitoringStation = asteroid;
-                    max = asteroid.AsteroidsDetected.Count;
+                    max = asteroid;
                 }
             }
-
-            var duplicateKeys = this.MonitoringStation.AsteroidsDetected.GroupBy(x => new { x.Coordinate.X, x.Coordinate.Y })
-                        .Where(group => group.Count() > 1);
 
             return max;
         }
@@ -215,41 +289,13 @@ namespace MonitoringStation
             return origin.AsteroidsDetected.Where(ast => ast.Coordinate.X != 0 && ast.Coordinate.Y != 0)
                 .Count(a =>
                 {
-                    if ((a.Coordinate.X > origin.Coordinate.X && x < origin.Coordinate.X)
-                    || (a.Coordinate.X < origin.Coordinate.X && x > origin.Coordinate.X)
-                    || (a.Coordinate.Y > origin.Coordinate.Y && y < origin.Coordinate.Y)
-                    || (a.Coordinate.Y < origin.Coordinate.Y && y > origin.Coordinate.Y))
-                    {
-                        return false;
-                    }
-
-
                     Coordinate oldA = new Coordinate(a.Coordinate.X - origin.Coordinate.X, a.Coordinate.Y - origin.Coordinate.Y);
                     Coordinate newA = new Coordinate(x - origin.Coordinate.X, y - origin.Coordinate.Y);
 
-                    //if ((newA.X == 0 && oldA.X != 0)
-                    //|| (oldA.X == 0 && newA.X != 0)
-                    //|| (newA.Y == 0 && oldA.Y != 0)
-                    //|| (oldA.Y == 0 && newA.Y != 0)
-                    //|| Math.Abs(oldA.X) >= Math.Abs(newA.X)
-                    //|| Math.Abs(oldA.Y) >= Math.Abs(newA.Y))
-                    if ((newA.X == 0 && oldA.X != 0)
-                    || (oldA.X == 0 && newA.X != 0)
-                    || (newA.Y == 0 && oldA.Y != 0)
-                    || (oldA.Y == 0 && newA.Y != 0))
-                    //if (oldA.X == 0 || oldA.Y == 0)
-                    {
-                        return false;
-                    }
+                    double oldAngle = Math.Atan2(oldA.Y, oldA.X);
+                    double newAngle = Math.Atan2(newA.Y, newA.X);
 
-                    //var val1 = (float)newA.X / oldA.X;
-                    //var val2 = (float)newA.Y / oldA.Y;
-                    //int val3 = newA.X % oldA.X;
-                    //int val4 = newA.Y % oldA.Y;
-
-                    return (newA.X % oldA.X == 0 && newA.Y % oldA.Y == 0
-                        && (float)newA.X / oldA.X == (float)newA.Y / oldA.Y)
-                        || (Math.Abs(newA.X) == Math.Abs(newA.Y) && Math.Abs(oldA.X) == Math.Abs(oldA.Y));
+                    return oldAngle == newAngle;
                 }) > 0;
         }
     }

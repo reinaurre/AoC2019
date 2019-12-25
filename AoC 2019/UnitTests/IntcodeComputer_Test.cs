@@ -131,7 +131,7 @@ namespace Tests
 
             // Act
             IC.ComputeIntcode(inputVal);
-            long output = IC.OutputValue[0];
+            long output = IC.OutputValue[IC.OutputValue.Count-1];
 
             // Assert
             Assert.That(output, Is.EqualTo(expected));
@@ -148,7 +148,7 @@ namespace Tests
 
             // Act
             IC.ComputeIntcode(inputVal);
-            long output = IC.OutputValue[0];
+            long output = IC.OutputValue[IC.OutputValue.Count-1];
 
             // Assert
             Assert.That(output, Is.EqualTo(expected));
@@ -191,7 +191,7 @@ namespace Tests
 
                                                 long[] inputVals = new long[2] { a, 0 };
                                                 IC1.ComputeIntcode(inputVals);
-                                                inputVals[1] = IC1.OutputValue[IC1.OutputValue.Count-1];
+                                                inputVals[1] = IC1.OutputValue[IC1.OutputValue.Count - 1];
 
                                                 inputVals[0] = b;
                                                 IC2.ComputeIntcode(inputVals);
@@ -256,40 +256,44 @@ namespace Tests
                                         {
                                             if (e != a && e != b && e != c && e != d)
                                             {
-                                                long[] inputVals = new long[2] { a, 0 };
-
                                                 IntcodeComputer IC1 = new IntcodeComputer(input);
                                                 IntcodeComputer IC2 = new IntcodeComputer(input);
                                                 IntcodeComputer IC3 = new IntcodeComputer(input);
                                                 IntcodeComputer IC4 = new IntcodeComputer(input);
                                                 IntcodeComputer IC5 = new IntcodeComputer(input);
 
+                                                long output = 0;
+                                                bool firstLoop = true;
                                                 while (IC5.LatestOpcode != Opcodes.Terminate)
                                                 {
-                                                    inputVals[0] = a;
+                                                    long[] inputVals = firstLoop ? new long[2] { a, 0 } : new long[1] { output };
+                                                    int outputIndex = firstLoop ? 1 : 0;
+
                                                     IC1.ComputeIntcode(inputVals, true);
-                                                    inputVals[1] = IC1.OutputValue[IC1.OutputValue.Count-1];
+                                                    inputVals[outputIndex] = IC1.OutputValue[IC1.OutputValue.Count - 1];
 
-                                                    inputVals[0] = b;
+                                                    inputVals[0] = firstLoop ? b : inputVals[0];
                                                     IC2.ComputeIntcode(inputVals, true);
-                                                    inputVals[1] = IC2.OutputValue[IC2.OutputValue.Count - 1];
+                                                    inputVals[outputIndex] = IC2.OutputValue[IC2.OutputValue.Count - 1];
 
-                                                    inputVals[0] = c;
+                                                    inputVals[0] = firstLoop ? c : inputVals[0];
                                                     IC3.ComputeIntcode(inputVals, true);
-                                                    inputVals[1] = IC3.OutputValue[IC3.OutputValue.Count - 1];
+                                                    inputVals[outputIndex] = IC3.OutputValue[IC3.OutputValue.Count - 1];
 
-                                                    inputVals[0] = d;
+                                                    inputVals[0] = firstLoop ? d : inputVals[0];
                                                     IC4.ComputeIntcode(inputVals, true);
-                                                    inputVals[1] = IC4.OutputValue[IC4.OutputValue.Count - 1];
+                                                    inputVals[outputIndex] = IC4.OutputValue[IC4.OutputValue.Count - 1];
 
-                                                    inputVals[0] = e;
+                                                    inputVals[0] = firstLoop ? e : inputVals[0];
                                                     IC5.ComputeIntcode(inputVals, true);
-                                                    inputVals[1] = IC5.OutputValue[IC5.OutputValue.Count - 1];
+                                                    output = IC5.OutputValue[IC5.OutputValue.Count - 1];
+
+                                                    firstLoop = false;
                                                 }
 
-                                                if (inputVals[1] > maxvalue)
+                                                if (output > maxvalue)
                                                 {
-                                                    maxvalue = inputVals[1];
+                                                    maxvalue = output;
                                                 }
                                             }
                                         }
