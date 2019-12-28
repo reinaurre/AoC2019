@@ -54,31 +54,99 @@ namespace OrbitalCalculator
             return output;
         }
 
+        public long GetRepeatStep()
+        {
+            long output = 0;
+            List<CelestialBody> LoopsFoundList = new List<CelestialBody>();
+
+            while (LoopsFoundList.Count < this.celestialBodies.Count)
+            {
+                if (output == 0 || output % 1000000 == 0)
+                {
+                    Console.WriteLine($"After {output} steps:");
+                    foreach (CelestialBody cb in this.celestialBodies)
+                    {
+                        Console.Write($"pos=<x={cb.Position.X}, y={cb.Position.Y}, z={cb.Position.Z}>, ");
+                        Console.Write($"vel=<x={cb.Velocity.X}, y={cb.Velocity.Y}, z={cb.Velocity.Z}>");
+                        Console.WriteLine();
+                    }
+                }
+
+                this.ComparePositions();
+
+                foreach(CelestialBody cb in this.celestialBodies)
+                {
+                    if(cb.LoopLength.X != 0 && cb.LoopLength.Y != 0 && cb.LoopLength.Z != 0 && !LoopsFoundList.Contains(cb))
+                    {
+                        LoopsFoundList.Add(cb);
+                    }
+                }
+
+                output++;
+            }
+
+            output = 0;
+            List<long> LCMs = new List<long>();
+
+            foreach(CelestialBody cb in this.celestialBodies)
+            {
+                LCMs.Add(this.FindLCM(new long[] { cb.LoopLength.X, cb.LoopLength.Y, cb.LoopLength.Z }));
+            }
+
+            return this.FindLCM(LCMs.ToArray());
+        }
+
+        private long FindLCM(long[] nums)
+        {
+            if(nums.Length < 2)
+            {
+                throw new ArgumentOutOfRangeException($"ERROR: Array length {nums.Length} too short to find LCM.");
+            }
+
+            long LCM = this.LeastCommonMultiple(nums[0], nums[1]);
+
+            if(nums.Length == 2)
+            {
+                return LCM;
+            }
+
+            for(int i = 2; i < nums.Length; i++)
+            {
+                LCM = this.LeastCommonMultiple(LCM, nums[i]);
+            }
+
+            return LCM;
+        }
+
+        private long LeastCommonMultiple(long a, long b)
+        {
+            return a / this.GreatestCommonDivisor(a, b) * b;
+        }
+
+        private long GreatestCommonDivisor(long a, long b)
+        {
+            while (b != 0)
+            {
+                long t = b;
+                b = a % b;
+                a = t;
+            }
+
+            return a;
+        }
+
         private int Step()
         {
             this.ComparePositions();
 
             int totalEnergy = 0;
-            bool isRepeat = true;
 
             foreach (CelestialBody cb in this.celestialBodies)
             {
-                bool temp = cb.ApplyVelocity();
-
-                if (isRepeat)
-                {
-                    isRepeat = temp;
-                }
-
                 int potential = Math.Abs(cb.Position.X) + Math.Abs(cb.Position.Y) + Math.Abs(cb.Position.Z);
                 int kinetic = Math.Abs(cb.Velocity.X) + Math.Abs(cb.Velocity.Y) + Math.Abs(cb.Velocity.Z);
 
                 totalEnergy += potential * kinetic;
-            }
-
-            if (isRepeat)
-            {
-
             }
 
             return totalEnergy;
