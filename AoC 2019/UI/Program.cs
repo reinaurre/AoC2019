@@ -91,9 +91,17 @@ namespace UI
             //Console.WriteLine("Day 11 Part 1:");
             //Day11Part1();
 
+            //Console.WriteLine();
+            //Console.WriteLine("Day 11 Part 2:");
+            //Day11Part2();
+
             Console.WriteLine();
-            Console.WriteLine("Day 11 Part 2:");
-            Day11Part2();
+            Console.WriteLine("Day 12 Part 1:");
+            Day12Part1();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 12 Part 2:");
+            //Day12Part2();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -748,6 +756,42 @@ namespace UI
                 MM.PopulatePaintMap(RC.PaintMap);
                 MM.PrintMap();
             }
+        }
+
+        public static void Day12Part1()
+        {
+            string fileName = "Day12/OfficialInput.txt";
+            //string fileName = "Day12/Part1Test.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            int totalSteps = fileName.Contains("Test") ? 10 : 1000;
+
+            OrbitalEnergyCalculator OEC = new OrbitalEnergyCalculator(totalSteps, lines);
+
+            int output = OEC.GetTotalEnergy();
+
+            Console.WriteLine("Total Energy:");
+            Console.WriteLine(output);
+        }
+
+        public static void Day12Part2()
+        {
+            //string fileName = "Day12/OfficialInput.txt";
+            string fileName = "Day12/Part2Test.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            int totalSteps = fileName.Contains("Test") ? 10 : 1000;
+
+            OrbitalEnergyCalculator OEC = new OrbitalEnergyCalculator(totalSteps, lines);
+
+            long output = OEC.GetRepeatStep();
+
+            Console.WriteLine("Repeats at step:");
+            Console.WriteLine(output+1);
         }
 
         private static void DisplayAsteroidMap(MonitoringStationManager MSM)
