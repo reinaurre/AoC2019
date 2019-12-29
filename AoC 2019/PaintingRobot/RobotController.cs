@@ -46,6 +46,10 @@ namespace PaintingRobot
                 // if current node == black input = 0
                 // white input = 1
                 inputs[0] = (int)this.PaintMap[this.PaintMap.FirstOrDefault(kvp => kvp.Key.X == base.RobotPosition.X && kvp.Key.Y == base.RobotPosition.Y).Key];
+
+                MapMaker MM = new MapMaker(this.PaintMap.Keys.ToList(), Node.Symbol.Empty);
+                MM.PopulatePaintMap(this.PaintMap);
+                MM.PrintWholeMap(true);
             }
         }
 

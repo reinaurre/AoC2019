@@ -6,6 +6,7 @@ namespace Intcode_Computer
 {
     public class IntcodeComputer
     {
+        public Dictionary<long, long> Memory = new Dictionary<long, long>();
         public List<long> OutputValue = new List<long>();
         public Opcodes LatestOpcode;
 
@@ -13,7 +14,6 @@ namespace Intcode_Computer
         private long Pointer = 0;
         private long InputPointer = 0;
         private long RelativeBase = 0;
-        private Dictionary<long, long> Memory = new Dictionary<long, long>();
 
         public IntcodeComputer(long[] intcode)
         {
@@ -23,6 +23,11 @@ namespace Intcode_Computer
         public IntcodeComputer(string intcodeStr)
         {
             this.Intcode = intcodeStr.ConvertToLongArray();
+        }
+
+        public void ModifyMemoryValue(long index, long value)
+        {
+            this.Intcode[index] = value;
         }
 
         public string ComputeIntcodeToString(long input = long.MaxValue)
@@ -72,12 +77,16 @@ namespace Intcode_Computer
         {
             this.LatestOpcode = Opcodes.Zero;
             this.InputPointer = 0;
+            int counter = 0;
 
-            while(this.Pointer < this.Intcode.Length && this.LatestOpcode != Opcodes.Terminate)
+            //while(this.Pointer < this.Intcode.Length && this.LatestOpcode != Opcodes.Terminate)
+            while(this.LatestOpcode != Opcodes.Terminate)
             {
                 long operationOutput = this.InputPointer >= inputs.Length 
                     ? this.Compute() 
                     : this.Compute(inputs[this.InputPointer]);
+
+                counter++;
 
                 if (operationOutput != long.MinValue)
                 {

@@ -106,9 +106,13 @@ namespace UI
             //Console.WriteLine("Day 12 Part 2:");
             //Day12Part2();
 
+            //Console.WriteLine();
+            //Console.WriteLine("Day 13 Part 1:");
+            //Day13Part1();
+
             Console.WriteLine();
-            Console.WriteLine("Day 13 Part 1:");
-            Day13Part1();
+            Console.WriteLine("Day 13 Part 2:");
+            Day13Part2();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -759,9 +763,10 @@ namespace UI
                 Console.WriteLine("Number Painted:");
                 Console.WriteLine(output);
 
-                MapMaker MM = new MapMaker(RC.PaintMap.Keys.ToList(),Node.Symbol.Empty);
-                MM.PopulatePaintMap(RC.PaintMap);
-                MM.PrintMap();
+                // Uncomment for just final output (make sure to comment these lines in RobotController)
+                //MapMaker MM = new MapMaker(RC.PaintMap.Keys.ToList(), Node.Symbol.Empty);
+                //MM.PopulatePaintMap(RC.PaintMap);
+                //MM.PrintWholeMap(true);
             }
         }
 
@@ -823,16 +828,37 @@ namespace UI
             foreach (string str in lines)
             {
                 Breakout B = new Breakout(str);
-                B.Execute();
+                B.Execute(0);
 
-                int output = B.GameGrid.Count;
+                int output = B.GameGrid.Count(x => x.Value == Tile.Block);
 
                 Console.WriteLine("Number of Tiles:");
                 Console.WriteLine(output);
 
+                // Uncomment for just final output (make sure to comment these lines in Breakout)
                 //MapMaker MM = new MapMaker(B.GameGrid.Keys.ToList(), Node.Symbol.Empty);
-                //MM.PopulateGameGrid(B.GameGrid);
-                //MM.PrintWholeMap();
+                //MM.PopulateGameGrid(B.GameGrid, 0);
+                //MM.PrintWholeMap(true);
+            }
+        }
+
+        public static void Day13Part2()
+        {
+            string fileName = "Day13/OfficialInput.txt";
+            // string fileName = "Day13/Part1Test.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            foreach (string str in lines)
+            {
+                Breakout B = new Breakout(str);
+                B.Execute(2);
+
+                int output = B.GameGrid.Count(x => x.Value == Tile.Block);
+
+                Console.WriteLine("Number of Tiles:");
+                Console.WriteLine(output);
             }
         }
 

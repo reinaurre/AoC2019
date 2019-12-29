@@ -16,13 +16,33 @@ namespace ArcadeCabinet
             this.IC = new IntcodeComputer(intcodeInput);
         }
 
-        public void Execute()
+        public void Execute(int coins, bool interactive = false)
         {
             long[] inputs = new long[] { 0 };
             long[] output;
+            long paddleX = 0;
+            long ballX = 0;
+
+            this.IC.ModifyMemoryValue(0, coins);
 
             while (IC.LatestOpcode != Opcodes.Terminate)
             {
+                if (interactive)
+                {
+                    switch (Console.ReadKey().Key)
+                    {
+                        case ConsoleKey.DownArrow:
+                        case ConsoleKey.UpArrow: inputs[0] = 0; break;
+                        case ConsoleKey.LeftArrow: inputs[0] = -1; break;
+                        case ConsoleKey.RightArrow: inputs[0] = 1; break;
+                        default: break;
+                    }
+                }
+                else
+                {
+                    inputs[0] = (paddleX > ballX) ? -1 : (paddleX < ballX) ? 1 : 0;
+                }
+
                 output = this.IC.ExecuteUntilOutputNumber(inputs, 3);
 
                 if (IC.LatestOpcode == Opcodes.Terminate)
@@ -36,20 +56,38 @@ namespace ArcadeCabinet
                 }
 
                 Coordinate xy = new Coordinate((int)output[0], (int)output[1]);
-                Tile t = (Tile)Enum.Parse(typeof(Tile), output[2].ToString());
+                long score = 0;
 
-                if (this.GameGrid.Count(kvp => kvp.Key.X == xy.X && kvp.Key.Y == xy.Y) == 0)
+                if (xy.X == -1 && xy.Y == 0)
                 {
-                    this.GameGrid.Add(new Coordinate(xy.X, xy.Y), t);
+                    score = output[2];
                 }
                 else
                 {
-                    this.GameGrid[this.GameGrid.FirstOrDefault(kvp => kvp.Key.X == xy.X && kvp.Key.Y == xy.Y).Key] = t;
+                    Tile t = (Tile)Enum.Parse(typeof(Tile), output[2].ToString());
+
+                    if(t == Tile.Ball)
+                    {
+                        ballX = xy.X;
+                    }
+                    else if(t == Tile.HPaddle)
+                    {
+                        paddleX = xy.X;
+                    }
+
+                    if (this.GameGrid.Count(kvp => kvp.Key.X == xy.X && kvp.Key.Y == xy.Y) == 0)
+                    {
+                        this.GameGrid.Add(new Coordinate(xy.X, xy.Y), t);
+                    }
+                    else
+                    {
+                        this.GameGrid[this.GameGrid.FirstOrDefault(kvp => kvp.Key.X == xy.X && kvp.Key.Y == xy.Y).Key] = t;
+                    }
                 }
 
                 MapMaker MM = new MapMaker(this.GameGrid.Keys.ToList(), Node.Symbol.Empty);
-                MM.PopulateGameGrid(this.GameGrid);
-                MM.PrintWholeMap();
+                MM.PopulateGameGrid(this.GameGrid, score);
+                MM.PrintLiveUpdates();
             }
         }
     }

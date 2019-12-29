@@ -8,6 +8,8 @@ namespace Utilities
         public Node[,] Map;
         private Coordinate max;
         private Coordinate min;
+        private bool hasScore = false;
+        private long score = 0;
 
         public MapMaker(List<Coordinate> coordinates, Node.Symbol defaultSymbol = Node.Symbol.Empty)
         {
@@ -28,8 +30,14 @@ namespace Utilities
             }
         }
 
-        public void PopulateGameGrid(Dictionary<Coordinate, Tile> gridValues)
+        public void PopulateGameGrid(Dictionary<Coordinate, Tile> gridValues, long score)
         {
+            if(score != 0)
+            {
+                this.hasScore = true;
+                this.score = score;
+            }
+
             foreach(KeyValuePair<Coordinate, Tile> kvp in gridValues)
             {
                 switch (kvp.Value)
@@ -55,9 +63,15 @@ namespace Utilities
             }
         }
 
-        public void PrintWholeMap()
+        /// <summary>
+        /// Flickers a lot.  Recommend use PrintLiveUpdates for live view.
+        /// </summary>
+        /// <param name="addBuffer"></param>
+        /// <param name="bufferSize"></param>
+        public void PrintWholeMap(bool addBuffer = false, int bufferSize = 30)
         {
             string output = string.Empty;
+            int outputRows = 0;
 
             for (int y = 0; y < this.Map.GetLength(1); y++)
             {
@@ -65,8 +79,52 @@ namespace Utilities
                 {
                     output += $"{(char)this.Map[x, y].Marker} ";
                 }
-                output += @"\n";
+
+                if (y == this.Map.GetLength(1) - 1 && this.hasScore)
+                {
+                    output += $"  Score: {this.score}";
+                }
+
+                output += "\n";
+                outputRows++;
             }
+
+            if (addBuffer)
+            {
+                string buffer = string.Empty;
+
+                for (int i = 0; i < bufferSize - outputRows; i++)
+                {
+                    buffer += "\n";
+                }
+
+                output = buffer + output;
+            }
+
+            Console.Write(output);
+        }
+
+        public void PrintLiveUpdates()
+        {
+            Console.CursorVisible = false;
+
+            for (int y = 0; y < this.Map.GetLength(1); y++)
+            {
+                Console.SetCursorPosition(10, y + 2);
+                for (int x = 0; x < this.Map.GetLength(0); x++)
+                {
+                    Console.Write($"{(char)this.Map[x, y].Marker} ");
+                }
+
+                if (y == this.Map.GetLength(1) - 1 && this.hasScore)
+                {
+                    Console.Write($"  Score: {this.score}");
+                }
+
+                Console.WriteLine();
+            }
+
+            Console.CursorVisible = true;
         }
 
         private void BuildMap(Node.Symbol defaultSymbol)
@@ -85,8 +143,10 @@ namespace Utilities
 
         private void CalculateBounds(List<Coordinate> coordinates)
         {
-            this.max = new Coordinate(short.MinValue, short.MinValue);
-            this.min = new Coordinate(short.MaxValue, short.MaxValue);
+            //this.max = new Coordinate(short.MinValue, short.MinValue);
+            //this.min = new Coordinate(short.MaxValue, short.MaxValue);
+            this.max = new Coordinate(0, 0);
+            this.min = new Coordinate(0, 0);
             
             foreach(Coordinate coordinate in coordinates)
             {
