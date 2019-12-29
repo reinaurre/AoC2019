@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Utilities;
 
 namespace WireManagement
 {
@@ -14,13 +15,5 @@ namespace WireManagement
             this.Direction = direction;
             this.Distance = distance;
         }
-    }
-
-    public enum Direction
-    {
-        Up = 'U',
-        Down = 'D',
-        Left = 'L',
-        Right = 'R'
     }
 }

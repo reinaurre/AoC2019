@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
-using WireManagement;
+using Utilities;
 
 namespace OrbitalCalculator
 {
@@ -56,44 +55,83 @@ namespace OrbitalCalculator
 
         public long GetRepeatStep()
         {
-            long output = 0;
             List<CelestialBody> LoopsFoundList = new List<CelestialBody>();
+            long stepNumber = 0;
 
-            while (LoopsFoundList.Count < this.celestialBodies.Count)
+            long minX = 0;
+            long minY = 0;
+            long minZ = 0;
+
+            for (int axis = 0; axis < 3; axis++)
             {
-                if (output == 0 || output % 1000000 == 0)
-                {
-                    Console.WriteLine($"After {output} steps:");
-                    foreach (CelestialBody cb in this.celestialBodies)
-                    {
-                        Console.Write($"pos=<x={cb.Position.X}, y={cb.Position.Y}, z={cb.Position.Z}>, ");
-                        Console.Write($"vel=<x={cb.Velocity.X}, y={cb.Velocity.Y}, z={cb.Velocity.Z}>");
-                        Console.WriteLine();
-                    }
-                }
-
-                this.ComparePositions();
-
                 foreach(CelestialBody cb in this.celestialBodies)
                 {
-                    if(cb.LoopLength.X != 0 && cb.LoopLength.Y != 0 && cb.LoopLength.Z != 0 && !LoopsFoundList.Contains(cb))
-                    {
-                        LoopsFoundList.Add(cb);
-                    }
+                    cb.Reset();
                 }
 
-                output++;
+                //while (LoopsFoundList.Count < this.celestialBodies.Count)
+                while(stepNumber < double.MaxValue)
+                {
+                    this.ComparePositions();
+
+                    foreach (CelestialBody cb in this.celestialBodies)
+                    {
+                        //cb.ApplyVelocity((int)stepNumber);
+                        cb.ApplyVelocity();
+
+                        //if (cb.LoopLength.X != 0 && cb.LoopLength.Y != 0 && cb.LoopLength.Z != 0 && !LoopsFoundList.Contains(cb))
+                        //if (cb.LoopStep != 0 && !LoopsFoundList.Contains(cb))
+                        //{
+                        //    LoopsFoundList.Add(cb);
+                        //}
+                    }
+
+                    bool match = true;
+
+                    foreach (CelestialBody cb in this.celestialBodies)
+                    {
+                        match &= (axis == 0 && cb.Velocity.X == 0) || (axis == 1 && cb.Velocity.Y == 0) || (axis == 2 && cb.Velocity.Z == 0);
+                    }
+
+                    if (match)
+                    {
+                        if (axis == 0)
+                        {
+                            minX = stepNumber;
+                        }
+                        else if (axis == 1)
+                        {
+                            minY = stepNumber;
+                        }
+                        else if (axis == 2)
+                        {
+                            minZ = stepNumber;
+                        }
+
+                        break;
+                    }
+
+                    stepNumber++;
+                }
             }
 
-            output = 0;
-            List<long> LCMs = new List<long>();
+            //List<long> LCMs = new List<long>();
 
-            foreach(CelestialBody cb in this.celestialBodies)
-            {
-                LCMs.Add(this.FindLCM(new long[] { cb.LoopLength.X, cb.LoopLength.Y, cb.LoopLength.Z }));
-            }
+            //foreach(CelestialBody cb in this.celestialBodies)
+            //{
+            //    LCMs.Add(this.FindLCM(new long[] { cb.LoopLength.X, cb.LoopLength.Y, cb.LoopLength.Z }));
+            //}
 
-            return this.FindLCM(LCMs.ToArray());
+            //foreach (CelestialBody cb in this.celestialBodies)
+            //{
+            //    LCMs.Add(cb.LoopStep);
+            //}
+
+            //long temp = this.FindLCM(LCMs.ToArray());
+
+            long temp = this.FindLCM(new long[] { minX, minY, minZ });
+            return temp;
+            // target: 4,686,774,924
         }
 
         private long FindLCM(long[] nums)
@@ -143,10 +181,9 @@ namespace OrbitalCalculator
 
             foreach (CelestialBody cb in this.celestialBodies)
             {
-                int potential = Math.Abs(cb.Position.X) + Math.Abs(cb.Position.Y) + Math.Abs(cb.Position.Z);
-                int kinetic = Math.Abs(cb.Velocity.X) + Math.Abs(cb.Velocity.Y) + Math.Abs(cb.Velocity.Z);
+                cb.ApplyVelocity();
 
-                totalEnergy += potential * kinetic;
+                totalEnergy += (int)cb.GetEnergy();
             }
 
             return totalEnergy;

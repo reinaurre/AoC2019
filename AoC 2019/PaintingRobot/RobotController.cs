@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WireManagement;
+using Utilities;
 
 namespace PaintingRobot
 {
@@ -54,12 +54,5 @@ namespace PaintingRobot
             this.PaintMap[this.PaintMap.FirstOrDefault(kvp => kvp.Key.X == base.RobotPosition.X && kvp.Key.Y == base.RobotPosition.Y).Key] = newColor;
             this.NumberPainted++;
         }
-    }
-
-    public enum Color
-    {
-        None = -1,
-        Black = 0,
-        White = 1
     }
 }

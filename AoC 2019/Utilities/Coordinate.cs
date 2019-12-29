@@ -1,4 +1,4 @@
-﻿namespace WireManagement
+﻿namespace Utilities
 {
     public class Coordinate
     {

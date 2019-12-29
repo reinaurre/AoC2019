@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonitoringStation", "Monito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintingRobot", "PaintingRobot\PaintingRobot.csproj", "{0F9552E2-8951-4F1E-ADED-9C2CB94F2C77}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcadeCabinet", "ArcadeCabinet\ArcadeCabinet.csproj", "{091D619F-1CD7-43E4-AA1C-22832FADF8B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{8AFA4813-48E4-4BDA-B467-3F8F8120F205}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{0F9552E2-8951-4F1E-ADED-9C2CB94F2C77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F9552E2-8951-4F1E-ADED-9C2CB94F2C77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F9552E2-8951-4F1E-ADED-9C2CB94F2C77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{091D619F-1CD7-43E4-AA1C-22832FADF8B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{091D619F-1CD7-43E4-AA1C-22832FADF8B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{091D619F-1CD7-43E4-AA1C-22832FADF8B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{091D619F-1CD7-43E4-AA1C-22832FADF8B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AFA4813-48E4-4BDA-B467-3F8F8120F205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AFA4813-48E4-4BDA-B467-3F8F8120F205}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AFA4813-48E4-4BDA-B467-3F8F8120F205}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AFA4813-48E4-4BDA-B467-3F8F8120F205}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

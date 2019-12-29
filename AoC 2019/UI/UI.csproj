@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ArcadeCabinet\ArcadeCabinet.csproj" />
     <ProjectReference Include="..\CodeCracker\CodeCracker.csproj" />
     <ProjectReference Include="..\Intcode Computer\Intcode Computer.csproj" />
     <ProjectReference Include="..\MonitoringStation\MonitoringStation.csproj" />
@@ -47,6 +48,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Day12\Part1Test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day13\OfficialInput.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day13\Part1Test.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Day13\Part2Test.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Day2\OriginalInput.txt">

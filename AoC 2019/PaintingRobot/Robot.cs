@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using WireManagement;
+using Utilities;
 
 namespace PaintingRobot
 {
@@ -64,11 +64,5 @@ namespace PaintingRobot
                     break;
             }
         }
-    }
-
-    public enum Turn
-    {
-        Left = 0,
-        Right = 1
     }
 }

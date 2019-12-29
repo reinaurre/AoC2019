@@ -1,12 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using ArcadeCabinet;
 using CodeCracker;
 using Intcode_Computer;
 using MonitoringStation;
 using OrbitalCalculator;
 using PaintingRobot;
 using SpaceImageFormat;
+using Utilities;
 using WireManagement;
 
 namespace UI
@@ -95,13 +98,17 @@ namespace UI
             //Console.WriteLine("Day 11 Part 2:");
             //Day11Part2();
 
-            Console.WriteLine();
-            Console.WriteLine("Day 12 Part 1:");
-            Day12Part1();
+            //Console.WriteLine();
+            //Console.WriteLine("Day 12 Part 1:");
+            //Day12Part1();
 
             //Console.WriteLine();
             //Console.WriteLine("Day 12 Part 2:");
             //Day12Part2();
+
+            Console.WriteLine();
+            Console.WriteLine("Day 13 Part 1:");
+            Day13Part1();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -778,8 +785,8 @@ namespace UI
 
         public static void Day12Part2()
         {
-            //string fileName = "Day12/OfficialInput.txt";
-            string fileName = "Day12/Part2Test.txt";
+            string fileName = "Day12/OfficialInput.txt";
+            //string fileName = "Day12/Part2Test.txt";
 
             Console.WriteLine("Parsing Input...");
             string[] lines = File.ReadAllLines(fileName);
@@ -788,10 +795,45 @@ namespace UI
 
             OrbitalEnergyCalculator OEC = new OrbitalEnergyCalculator(totalSteps, lines);
 
-            long output = OEC.GetRepeatStep();
+            //long output = OEC.GetRepeatStep();
 
-            Console.WriteLine("Repeats at step:");
-            Console.WriteLine(output+1);
+            //Console.WriteLine("Repeats at step:");
+            //Console.WriteLine(output+1);
+
+
+            Moon[] moons = new Moon[]
+            {
+                new Moon('I', new Vector3(OEC.celestialBodies[0].Position.X, OEC.celestialBodies[0].Position.Y, OEC.celestialBodies[0].Position.Z)),
+                new Moon('E', new Vector3(OEC.celestialBodies[1].Position.X, OEC.celestialBodies[1].Position.Y, OEC.celestialBodies[1].Position.Z)),
+                new Moon('G', new Vector3(OEC.celestialBodies[2].Position.X, OEC.celestialBodies[2].Position.Y, OEC.celestialBodies[2].Position.Z)),
+                new Moon('C', new Vector3(OEC.celestialBodies[3].Position.X, OEC.celestialBodies[3].Position.Y, OEC.celestialBodies[3].Position.Z)),
+            };
+
+            moons = SomeoneElsesAnswer_Day12Part2.ProcessOrbit(moons);
+        }
+
+        public static void Day13Part1()
+        {
+            string fileName = "Day13/OfficialInput.txt";
+            // string fileName = "Day13/Part1Test.txt";
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            foreach (string str in lines)
+            {
+                Breakout B = new Breakout(str);
+                B.Execute();
+
+                int output = B.GameGrid.Count;
+
+                Console.WriteLine("Number of Tiles:");
+                Console.WriteLine(output);
+
+                //MapMaker MM = new MapMaker(B.GameGrid.Keys.ToList(), Node.Symbol.Empty);
+                //MM.PopulateGameGrid(B.GameGrid);
+                //MM.PrintWholeMap();
+            }
         }
 
         private static void DisplayAsteroidMap(MonitoringStationManager MSM)

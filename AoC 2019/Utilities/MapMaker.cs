@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using WireManagement;
 
-namespace PaintingRobot
+namespace Utilities
 {
     public class MapMaker
     {
@@ -30,6 +28,21 @@ namespace PaintingRobot
             }
         }
 
+        public void PopulateGameGrid(Dictionary<Coordinate, Tile> gridValues)
+        {
+            foreach(KeyValuePair<Coordinate, Tile> kvp in gridValues)
+            {
+                switch (kvp.Value)
+                {
+                    case Tile.Empty: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.Empty; break;
+                    case Tile.Ball: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.O; break;
+                    case Tile.Block: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.Box; break;
+                    case Tile.HPaddle: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.HLines; break;
+                    case Tile.Wall: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.VLines; break;
+                }
+            }
+        }
+
         public void PrintMap()
         {
             for (int y = 0; y < this.Map.GetLength(1); y++)
@@ -39,6 +52,20 @@ namespace PaintingRobot
                     Console.Write($"{(char)this.Map[x, y].Marker} ");
                 }
                 Console.WriteLine();
+            }
+        }
+
+        public void PrintWholeMap()
+        {
+            string output = string.Empty;
+
+            for (int y = 0; y < this.Map.GetLength(1); y++)
+            {
+                for (int x = 0; x < this.Map.GetLength(0); x++)
+                {
+                    output += $"{(char)this.Map[x, y].Marker} ";
+                }
+                output += @"\n";
             }
         }
 
@@ -58,8 +85,8 @@ namespace PaintingRobot
 
         private void CalculateBounds(List<Coordinate> coordinates)
         {
-            this.max = new Coordinate(int.MinValue, int.MinValue);
-            this.min = new Coordinate(int.MaxValue, int.MaxValue);
+            this.max = new Coordinate(short.MinValue, short.MinValue);
+            this.min = new Coordinate(short.MaxValue, short.MaxValue);
             
             foreach(Coordinate coordinate in coordinates)
             {
@@ -97,7 +124,9 @@ namespace PaintingRobot
             SmallX = '×',
             Box = '■',
             Dot = '.',
-            Hash = '#'
+            Hash = '#',
+            VLines = '║',
+            HLines = '═'
         }
     }
 }

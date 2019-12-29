@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using WireManagement;
+using Utilities;
 
 namespace OrbitalCalculator
 {
@@ -12,6 +12,7 @@ namespace OrbitalCalculator
         public Coordinate3 Position { get; set; }
         public Coordinate3 Velocity { get; set; }
         public Coordinate3 LoopLength = new Coordinate3(0, 0, 0);
+        public long LoopStep = 0;
 
         private Coordinate3 OriginalPosition;
 
@@ -57,6 +58,12 @@ namespace OrbitalCalculator
             this.Velocity = new Coordinate3(0, 0, 0);
         }
 
+        public void Reset()
+        {
+            this.Position = this.OriginalPosition;
+            this.Velocity = new Coordinate3(0, 0, 0);
+        }
+
         public void AddSatellite(CelestialBody newSatellite)
         {
             this.Satellites.Add(newSatellite);
@@ -72,20 +79,6 @@ namespace OrbitalCalculator
             this.Position.SetX(this.Position.X + this.Velocity.X);
             this.Position.SetY(this.Position.Y + this.Velocity.Y);
             this.Position.SetZ(this.Position.Z + this.Velocity.Z);
-
-            if(this.Position.X == this.OriginalPosition.X && this.LoopLength.X == 0 && stepNumber != -1)
-            {
-                this.LoopLength.SetX(stepNumber);
-            }
-            if (this.Position.Y == this.OriginalPosition.Y && this.LoopLength.Y == 0 && stepNumber != -1)
-            {
-                this.LoopLength.SetY(stepNumber);
-            }
-            if (this.Position.Z == this.OriginalPosition.Z && this.LoopLength.Z == 0 && stepNumber != -1)
-            {
-                this.LoopLength.SetZ(stepNumber);
-            }
-
         }
 
         public void UpdateVelocity(Coordinate3 delta)
@@ -93,6 +86,13 @@ namespace OrbitalCalculator
             this.Velocity.SetX(this.Velocity.X + delta.X);
             this.Velocity.SetY(this.Velocity.Y + delta.Y);
             this.Velocity.SetZ(this.Velocity.Z + delta.Z);
+        }
+
+        public long GetEnergy()
+        {
+            int potential = Math.Abs(this.Position.X) + Math.Abs(this.Position.Y) + Math.Abs(this.Position.Z);
+            int kinetic = Math.Abs(this.Velocity.X) + Math.Abs(this.Velocity.Y) + Math.Abs(this.Velocity.Z);
+            return potential * kinetic;
         }
     }
 }
