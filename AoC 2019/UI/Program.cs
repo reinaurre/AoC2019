@@ -11,6 +11,7 @@ using PaintingRobot;
 using SpaceImageFormat;
 using Utilities;
 using WireManagement;
+using ChemicalReactor;
 
 namespace UI
 {
@@ -110,9 +111,17 @@ namespace UI
             //Console.WriteLine("Day 13 Part 1:");
             //Day13Part1();
 
+            //Console.WriteLine();
+            //Console.WriteLine("Day 13 Part 2:");
+            //Day13Part2();
+
+            //Console.WriteLine();
+            //Console.WriteLine("Day 14 Part 1:");
+            //Day14Part1();
+
             Console.WriteLine();
-            Console.WriteLine("Day 13 Part 2:");
-            Day13Part2();
+            Console.WriteLine("Day 14 Part 2:");
+            Day14Part2();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -860,6 +869,42 @@ namespace UI
                 Console.WriteLine("Number of Tiles:");
                 Console.WriteLine(output);
             }
+        }
+
+        public static void Day14Part1()
+        {
+            string fileName = "Day14/OfficialInput.txt";
+            //string fileName = "Day14/Part1Test1.txt"; // 31
+            //string fileName = "Day14/Part1Test2.txt"; // 165
+            //string fileName = "Day14/Part1Test3.txt"; // 13312
+            //string fileName = "Day14/Part1Test4.txt"; // 180697
+            //string fileName = "Day14/Part1Test5.txt"; // 2210736
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            ChemicalReactor.ChemicalReactor CR = new ChemicalReactor.ChemicalReactor(lines);
+            int output = CR.CalculateMinimumRequired("FUEL", "ORE");
+
+            Console.WriteLine("Minimum Required:");
+            Console.WriteLine(output);
+        }
+
+        public static void Day14Part2()
+        {
+            string fileName = "Day14/OfficialInput.txt";
+            //string fileName = "Day14/Part1Test3.txt"; // 13312 => 82892753
+            //string fileName = "Day14/Part1Test4.txt"; // 180697 => 5586022 
+            //string fileName = "Day14/Part1Test5.txt"; // 2210736 => 460664 
+
+            Console.WriteLine("Parsing Input...");
+            string[] lines = File.ReadAllLines(fileName);
+
+            ChemicalReactor.ChemicalReactor CR = new ChemicalReactor.ChemicalReactor(lines);
+            long output = CR.CalculateMaximumOutput("FUEL", "ORE");
+
+            Console.WriteLine("Maximum Possible:");
+            Console.WriteLine(output);
         }
 
         private static void DisplayAsteroidMap(MonitoringStationManager MSM)
