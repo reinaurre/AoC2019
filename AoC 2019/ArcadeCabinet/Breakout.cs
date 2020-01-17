@@ -85,7 +85,7 @@ namespace ArcadeCabinet
                     }
                 }
 
-                MapMaker MM = new MapMaker(this.GameGrid.Keys.ToList(), Node.Symbol.Empty);
+                MapMaker MM = new MapMaker(this.GameGrid.Keys.ToList(), Symbol.Empty);
                 MM.PopulateGameGrid(this.GameGrid, score);
                 MM.PrintLiveUpdates();
             }

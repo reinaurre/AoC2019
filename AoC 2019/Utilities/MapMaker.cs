@@ -11,11 +11,19 @@ namespace Utilities
         private bool hasScore = false;
         private long score = 0;
 
-        public MapMaker(List<Coordinate> coordinates, Node.Symbol defaultSymbol = Node.Symbol.Empty)
+        public MapMaker(List<Coordinate> coordinates, Symbol defaultSymbol = Symbol.Empty)
         {
             this.CalculateBounds(coordinates);
             this.Map = new Node[Math.Abs(this.max.X)+Math.Abs(this.min.X)+1,Math.Abs(this.max.Y)+Math.Abs(this.min.Y)+1];
             this.BuildMap(defaultSymbol);
+        }
+
+        public void PopulateRepairMap(Dictionary<Coordinate,Symbol> mapValues)
+        {
+            foreach(KeyValuePair<Coordinate, Symbol> kvp in mapValues)
+            {
+                Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = kvp.Value;
+            }
         }
 
         public void PopulatePaintMap(Dictionary<Coordinate,Color> mapValues)
@@ -24,8 +32,8 @@ namespace Utilities
             {
                 switch (kvp.Value)
                 {
-                    case Color.Black: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.Dot; break;
-                    case Color.White: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.Box; break;
+                    case Color.Black: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Symbol.Dot; break;
+                    case Color.White: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Symbol.Box; break;
                 }
             }
         }
@@ -42,11 +50,11 @@ namespace Utilities
             {
                 switch (kvp.Value)
                 {
-                    case Tile.Empty: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.Empty; break;
-                    case Tile.Ball: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.O; break;
-                    case Tile.Block: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.Box; break;
-                    case Tile.HPaddle: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.HLines; break;
-                    case Tile.Wall: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Node.Symbol.VLines; break;
+                    case Tile.Empty: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Symbol.Empty; break;
+                    case Tile.Ball: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Symbol.O; break;
+                    case Tile.Block: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Symbol.Box; break;
+                    case Tile.HPaddle: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Symbol.HLines; break;
+                    case Tile.Wall: Map[kvp.Key.X + Math.Abs(min.X), kvp.Key.Y + Math.Abs(min.Y)].Marker = Symbol.VLines; break;
                 }
             }
         }
@@ -127,7 +135,7 @@ namespace Utilities
             Console.CursorVisible = true;
         }
 
-        private void BuildMap(Node.Symbol defaultSymbol)
+        private void BuildMap(Symbol defaultSymbol)
         {
             for (int y = 0; y < this.Map.GetLength(1); y++)
             {
@@ -176,17 +184,5 @@ namespace Utilities
 
         public Coordinate Coordinate;
         public Symbol Marker;
-        public enum Symbol
-        {
-            Empty = ' ',
-            O = 'O',
-            BigX = 'X',
-            SmallX = '×',
-            Box = '■',
-            Dot = '.',
-            Hash = '#',
-            VLines = '║',
-            HLines = '═'
-        }
     }
 }

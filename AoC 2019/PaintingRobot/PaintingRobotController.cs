@@ -6,13 +6,13 @@ using Utilities;
 
 namespace PaintingRobot
 {
-    public class RobotController : Robot
+    public class PaintingRobotController : Robot
     {
         public Dictionary<Coordinate, Color> PaintMap = new Dictionary<Coordinate, Color>();
         public int NumberPainted = 0;
         private IntcodeComputer IC;
 
-        public RobotController(int x, int y, string program)
+        public PaintingRobotController(int x, int y, string program)
         {
             base.RobotPosition = new Coordinate(x, y);
             base.RobotFacing = Direction.Up;
@@ -47,7 +47,7 @@ namespace PaintingRobot
                 // white input = 1
                 inputs[0] = (int)this.PaintMap[this.PaintMap.FirstOrDefault(kvp => kvp.Key.X == base.RobotPosition.X && kvp.Key.Y == base.RobotPosition.Y).Key];
 
-                MapMaker MM = new MapMaker(this.PaintMap.Keys.ToList(), Node.Symbol.Empty);
+                MapMaker MM = new MapMaker(this.PaintMap.Keys.ToList(), Symbol.Empty);
                 MM.PopulatePaintMap(this.PaintMap);
                 MM.PrintWholeMap(true);
             }

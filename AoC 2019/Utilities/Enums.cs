@@ -17,6 +17,19 @@ namespace Utilities
         Right = 'R'
     }
 
+    public enum Symbol
+    {
+        Empty = ' ',
+        O = 'O',
+        BigX = 'X',
+        SmallX = '×',
+        Box = '■',
+        Dot = '.',
+        Hash = '#',
+        VLines = '║',
+        HLines = '═'
+    }
+
     public enum Tile
     {
         Empty = 0,

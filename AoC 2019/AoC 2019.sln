@@ -21,13 +21,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceImageFormat", "SpaceIm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonitoringStation", "MonitoringStation\MonitoringStation.csproj", "{9AB621D9-8385-460F-AEC0-FD4A570BF293}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaintingRobot", "PaintingRobot\PaintingRobot.csproj", "{0F9552E2-8951-4F1E-ADED-9C2CB94F2C77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteBotControl", "PaintingRobot\RemoteBotControl.csproj", "{0F9552E2-8951-4F1E-ADED-9C2CB94F2C77}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArcadeCabinet", "ArcadeCabinet\ArcadeCabinet.csproj", "{091D619F-1CD7-43E4-AA1C-22832FADF8B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "Utilities\Utilities.csproj", "{8AFA4813-48E4-4BDA-B467-3F8F8120F205}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemicalReactor", "ChemicalReactor\ChemicalReactor.csproj", "{048454D5-E6BE-43EF-8DC6-BEF7C4BDA84D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChemicalReactor", "ChemicalReactor\ChemicalReactor.csproj", "{048454D5-E6BE-43EF-8DC6-BEF7C4BDA84D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

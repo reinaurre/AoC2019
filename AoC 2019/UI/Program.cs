@@ -12,6 +12,7 @@ using SpaceImageFormat;
 using Utilities;
 using WireManagement;
 using ChemicalReactor;
+using RemoteBotControl;
 
 namespace UI
 {
@@ -119,9 +120,13 @@ namespace UI
             //Console.WriteLine("Day 14 Part 1:");
             //Day14Part1();
 
+            //Console.WriteLine();
+            //Console.WriteLine("Day 14 Part 2:");
+            //Day14Part2();
+
             Console.WriteLine();
-            Console.WriteLine("Day 14 Part 2:");
-            Day14Part2();
+            Console.WriteLine("Day 15 Part 1:");
+            Day15Part1();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -742,7 +747,7 @@ namespace UI
             int counter = 0;
             foreach (string str in lines)
             {
-                RobotController RC = new RobotController(0, 0, str);
+                PaintingRobotController RC = new PaintingRobotController(0, 0, str);
                 RC.ExecutePaintingProgram();
 
                 int output = RC.PaintMap.Count;
@@ -764,7 +769,7 @@ namespace UI
 
             foreach (string str in lines)
             {
-                RobotController RC = new RobotController(0, 0, str);
+                PaintingRobotController RC = new PaintingRobotController(0, 0, str);
                 RC.ExecutePaintingProgram();
 
                 int output = RC.PaintMap.Count;
@@ -905,6 +910,30 @@ namespace UI
 
             Console.WriteLine("Maximum Possible:");
             Console.WriteLine(output);
+        }
+
+        public static void Day15Part1()
+        {
+            //string fileName = "Day15/OfficialInput.txt";
+            string fileName = "Day15/ZyrInput.txt";
+
+            string[] lines = File.ReadAllLines(fileName);
+
+            foreach (string str in lines)
+            {
+                RepairBotController RBC = new RepairBotController(0, 0, str);
+                RBC.ExecuteWanderProgram();
+
+                //int output = RBC.Map.Count;
+
+                //Console.WriteLine("Number Painted:");
+                //Console.WriteLine(output);
+
+                // Uncomment for just final output (make sure to comment these lines in RobotController)
+                //MapMaker MM = new MapMaker(RC.PaintMap.Keys.ToList(), Node.Symbol.Empty);
+                //MM.PopulatePaintMap(RC.PaintMap);
+                //MM.PrintWholeMap(true);
+            }
         }
 
         private static void DisplayAsteroidMap(MonitoringStationManager MSM)
