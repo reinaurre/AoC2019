@@ -11,9 +11,16 @@ namespace RemoteBotControl
     {
         public Dictionary<Coordinate, Symbol> Map = new Dictionary<Coordinate, Symbol>();
         private Coordinate BotPosition;
+        private Coordinate TargetPosition;
         private Coordinate previousLocation;
         private Direction Heading;
         private IntcodeComputer IC;
+
+        private int minX = 0;
+        private int maxX = 0;
+        private int minY = 0;
+        private int maxY = 0;
+        private long totalArea = long.MaxValue;
 
         public RepairBotController(int x, int y, string program)
         {
@@ -27,11 +34,10 @@ namespace RemoteBotControl
         {
             long[] inputs = new long[] { 1 };
             long[] outputVals;
-            bool mapComplete = false;
-            previousLocation = this.Map.Keys.First();
+            this.previousLocation = this.Map.Keys.First();
             int counter = 0;
 
-            while (!mapComplete)
+            while (this.Map.Count < this.totalArea - (Math.Ceiling(this.totalArea * 0.01) + 5)) // +5 is for the corners and rounding up to the nearest whole
             {
                 outputVals = this.IC.ExecuteUntilOutputNumber(inputs, 1);
 
@@ -53,6 +59,7 @@ namespace RemoteBotControl
                         }
                         break;
                     case 1: // success
+                        this.previousLocation = new Coordinate(this.BotPosition.X, this.BotPosition.Y);
                         this.UpdateBotPosition(inputs[0]);
                         Coordinate newLocation = new Coordinate(this.BotPosition.X, this.BotPosition.Y);
                         if (outputSymbol == Symbol.Empty)
@@ -63,25 +70,24 @@ namespace RemoteBotControl
                         {
                             this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == newLocation.X && kvp.Key.Y == newLocation.Y).Key] = Symbol.SmallX;
                         }
-                        if(this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == previousLocation.X && kvp.Key.Y == previousLocation.Y).Key] != Symbol.O)
+                        if(this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == this.previousLocation.X && kvp.Key.Y == this.previousLocation.Y).Key] != Symbol.O)
                         {
-                            this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == previousLocation.X && kvp.Key.Y == previousLocation.Y).Key] = Symbol.Dot;
+                            this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == this.previousLocation.X && kvp.Key.Y == this.previousLocation.Y).Key] = Symbol.Dot;
                         }
-                        previousLocation = newLocation;
                         break;
                     case 2: // target
+                        this.previousLocation = new Coordinate(this.BotPosition.X, this.BotPosition.Y);
                         this.UpdateBotPosition(inputs[0]);
-                        Coordinate newLoc = new Coordinate(this.BotPosition.X, this.BotPosition.Y);
+                        this.TargetPosition = new Coordinate(this.BotPosition.X, this.BotPosition.Y);
                         if (outputSymbol == Symbol.Empty)
                         {
-                            this.Map.Add(newLoc, Symbol.O);
+                            this.Map.Add(this.TargetPosition, Symbol.O);
                         }
                         else
                         {
-                            this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == newLoc.X && kvp.Key.Y == newLoc.Y).Key] = Symbol.O;
+                            this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == this.TargetPosition.X && kvp.Key.Y == this.TargetPosition.Y).Key] = Symbol.O;
                         }
-                        this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == previousLocation.X && kvp.Key.Y == previousLocation.Y).Key] = Symbol.Dot;
-                        previousLocation = newLoc;
+                        this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == this.previousLocation.X && kvp.Key.Y == this.previousLocation.Y).Key] = Symbol.Dot;
                         break;
                 }
 
@@ -92,11 +98,20 @@ namespace RemoteBotControl
                 {
                     counter = 0;
                     MapMaker MM = new MapMaker(this.Map.Keys.ToList(), Symbol.Empty);
-                    MM.PopulateRepairMap(this.Map);
-                    MM.PrintLiveUpdates();
-                    //MM.PrintWholeMap(true);
+                    //MM.PopulateRepairMap(this.Map);
+                    //MM.PrintLiveUpdates();
                 }
             }
+        }
+
+        public long GetShortestPath()
+        {
+            return this.ShortestPath(0, 0, 0, 0, 0);
+        }
+
+        public long GetLongestPath()
+        {
+            return this.LongestPath(this.TargetPosition.X, this.TargetPosition.Y, 0, this.TargetPosition.X, this.TargetPosition.Y);
         }
 
         private Symbol CheckForExisting(long moveDirection)
@@ -167,6 +182,16 @@ namespace RemoteBotControl
                     this.BotPosition.SetX(this.BotPosition.X + 1);
                     break;
             }
+
+            this.minX = this.BotPosition.X < this.minX ? this.BotPosition.X : this.minX;
+            this.maxX = this.BotPosition.X > this.maxX ? this.BotPosition.X : this.maxX;
+            this.minY = this.BotPosition.Y < this.minY ? this.BotPosition.Y : this.minY;
+            this.maxY = this.BotPosition.Y > this.maxY ? this.BotPosition.Y : this.maxY;
+
+            if (this.Map.Count > 100) // gross hack, but oh well
+            {
+                this.totalArea = (Math.Abs(this.minX) + Math.Abs(this.maxX) + 3) * (Math.Abs(this.minY) + Math.Abs(this.maxY) + 3);  // +3 are because the perimeter is always walls and we can't reach them, also account for the zero index
+            }
         }
 
         private long DetermineNextMoveDirection()
@@ -207,10 +232,10 @@ namespace RemoteBotControl
                     break;
             }
 
-            bool leftPath = false;
-            bool rightPath = false;
-            bool forwardPath = false;
-            bool backPath = false;
+            bool leftPath = true;
+            bool rightPath = true;
+            bool forwardPath = true;
+            bool backPath = true;
 
             // check left path:
             if (this.Map.Where(kvp => kvp.Key.X == this.BotPosition.X + directionMods[left].X && kvp.Key.Y == this.BotPosition.Y + directionMods[left].Y).Count() > 0)
@@ -248,10 +273,10 @@ namespace RemoteBotControl
             {
                 // forward path has already been checked. Now remember if it's an available route even if we've been there:
                 forwardPath = this.Map.Where(kvp => kvp.Key.X == this.BotPosition.X + directionMods[forward].X && kvp.Key.Y == this.BotPosition.Y + directionMods[forward].Y).FirstOrDefault().Value != Symbol.Box;
-                Coordinate temp = this.Map.FirstOrDefault(kvp => kvp.Key.X == this.BotPosition.X + directionMods[left].X && kvp.Key.Y == this.BotPosition.Y + directionMods[left].Y).Key;
+                Coordinate temp = this.Map.FirstOrDefault(kvp => kvp.Key.X == this.BotPosition.X + directionMods[forward].X && kvp.Key.Y == this.BotPosition.Y + directionMods[forward].Y).Key;
                 if (temp.X == this.previousLocation.X && temp.Y == this.previousLocation.Y)
                 {
-                    previousStep = Direction.Up;
+                    previousStep = Direction.Forward;
                 }
             }
             else // forward path open, so take it
@@ -274,7 +299,7 @@ namespace RemoteBotControl
             {
                 // right path has already been checked. Now remember if it's an available route even if we've been there:
                 rightPath = this.Map.Where(kvp => kvp.Key.X == this.BotPosition.X + directionMods[right].X && kvp.Key.Y == this.BotPosition.Y + directionMods[right].Y).FirstOrDefault().Value != Symbol.Box;
-                Coordinate temp = this.Map.FirstOrDefault(kvp => kvp.Key.X == this.BotPosition.X + directionMods[left].X && kvp.Key.Y == this.BotPosition.Y + directionMods[left].Y).Key;
+                Coordinate temp = this.Map.FirstOrDefault(kvp => kvp.Key.X == this.BotPosition.X + directionMods[right].X && kvp.Key.Y == this.BotPosition.Y + directionMods[right].Y).Key;
                 if (temp.X == this.previousLocation.X && temp.Y == this.previousLocation.Y)
                 {
                     previousStep = Direction.Right;
@@ -304,10 +329,10 @@ namespace RemoteBotControl
             {
                 // back path has already been checked. Now remember if it's an available route even if we've been there:
                 backPath = this.Map.Where(kvp => kvp.Key.X == this.BotPosition.X + directionMods[back].X && kvp.Key.Y == this.BotPosition.Y + directionMods[back].Y).FirstOrDefault().Value != Symbol.Box;
-                Coordinate temp = this.Map.FirstOrDefault(kvp => kvp.Key.X == this.BotPosition.X + directionMods[left].X && kvp.Key.Y == this.BotPosition.Y + directionMods[left].Y).Key;
+                Coordinate temp = this.Map.FirstOrDefault(kvp => kvp.Key.X == this.BotPosition.X + directionMods[back].X && kvp.Key.Y == this.BotPosition.Y + directionMods[back].Y).Key;
                 if (temp.X == this.previousLocation.X && temp.Y == this.previousLocation.Y)
                 {
-                    previousStep = Direction.Down;
+                    previousStep = Direction.Back;
                 }
             }
             else // back path open, so take it
@@ -334,31 +359,31 @@ namespace RemoteBotControl
             switch (this.Heading)
             {
                 case Direction.Left:
-                    destination = (leftPath && previousStep != Direction.Down) ? Direction.Down
-                        : (forwardPath && previousStep != Direction.Left) ? Direction.Left
-                            : (rightPath && previousStep != Direction.Up) ? Direction.Up
-                                : (backPath && previousStep != Direction.Right) ? Direction.Right
+                    destination = (leftPath && previousStep != Direction.Left) ? Direction.Down
+                        : (forwardPath && previousStep != Direction.Forward) ? Direction.Left
+                            : (rightPath && previousStep != Direction.Right) ? Direction.Up
+                                : (backPath && previousStep != Direction.Back) ? Direction.Right
                                     : leftPath ? Direction.Down : forwardPath ? Direction.Left : rightPath ? Direction.Up : backPath ? Direction.Right : Direction.Left;
                     break;
                 case Direction.Up:
                     destination = (leftPath && previousStep != Direction.Left) ? Direction.Left 
-                        : (forwardPath && previousStep != Direction.Up) ? Direction.Up 
+                        : (forwardPath && previousStep != Direction.Forward) ? Direction.Up 
                             : (rightPath && previousStep != Direction.Right) ? Direction.Right 
-                                : (backPath && previousStep != Direction.Down) ? Direction.Down 
+                                : (backPath && previousStep != Direction.Back) ? Direction.Down 
                                     : leftPath ? Direction.Left : forwardPath ? Direction.Up : rightPath ? Direction.Right : backPath ? Direction.Down : Direction.Up;
                     break;
                 case Direction.Right:
-                    destination = (leftPath && previousStep != Direction.Up) ? Direction.Up 
-                        : (forwardPath && previousStep != Direction.Right) ? Direction.Right 
-                            : (rightPath && previousStep != Direction.Down) ? Direction.Down 
-                                : (backPath && previousStep != Direction.Left) ? Direction.Left 
+                    destination = (leftPath && previousStep != Direction.Left) ? Direction.Up 
+                        : (forwardPath && previousStep != Direction.Forward) ? Direction.Right 
+                            : (rightPath && previousStep != Direction.Right) ? Direction.Down 
+                                : (backPath && previousStep != Direction.Back) ? Direction.Left 
                                     : leftPath ? Direction.Up : forwardPath ? Direction.Right : rightPath ? Direction.Down : backPath ? Direction.Left : Direction.Right;
                     break;
                 case Direction.Down:
-                    destination = (leftPath && previousStep != Direction.Right) ? Direction.Right 
-                        : (forwardPath && previousStep != Direction.Down) ? Direction.Down 
-                            : (rightPath && previousStep != Direction.Left) ? Direction.Left 
-                                : (backPath && previousStep != Direction.Up) ? Direction.Up 
+                    destination = (leftPath && previousStep != Direction.Left) ? Direction.Right 
+                        : (forwardPath && previousStep != Direction.Forward) ? Direction.Down 
+                            : (rightPath && previousStep != Direction.Right) ? Direction.Left 
+                                : (backPath && previousStep != Direction.Back) ? Direction.Up 
                                     : leftPath ? Direction.Right : forwardPath ? Direction.Down : rightPath ? Direction.Left : backPath ? Direction.Up : Direction.Down;
                     break;
             }
@@ -380,6 +405,90 @@ namespace RemoteBotControl
 
             // won't ever get here
             return 0;
+        }
+
+        private long ShortestPath(int curX, int curY, long steps, int prevX, int prevY)
+        {
+            if(curX == this.TargetPosition.X && curY == this.TargetPosition.Y)
+            {
+                return steps;
+            }
+
+            //up
+            if(curY - 1 != prevY && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX && kvp.Key.Y == curY - 1).Key] != Symbol.Box)
+            {
+                long temp = this.ShortestPath(curX, curY - 1, steps + 1, curX, curY);
+                if(temp != 0)
+                {
+                    return temp;
+                }
+            }
+
+            // down
+            if (curY + 1 != prevY && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX && kvp.Key.Y == curY + 1).Key] != Symbol.Box)
+            {
+                long temp = this.ShortestPath(curX, curY + 1, steps + 1, curX, curY);
+                if (temp != 0)
+                {
+                    return temp;
+                }
+            }
+
+            // left
+            if (curX - 1 != prevX && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX - 1 && kvp.Key.Y == curY).Key] != Symbol.Box)
+            {
+                long temp = this.ShortestPath(curX - 1, curY, steps + 1, curX, curY);
+                if (temp != 0)
+                {
+                    return temp;
+                }
+            }
+
+            // right
+            if (curX + 1 != prevX && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX + 1 && kvp.Key.Y == curY).Key] != Symbol.Box)
+            {
+                long temp = this.ShortestPath(curX + 1, curY, steps + 1, curX, curY);
+                if (temp != 0)
+                {
+                    return temp;
+                }
+            }
+
+            return 0;
+        }
+
+        private long LongestPath(int curX, int curY, long steps, int prevX, int prevY)
+        {
+            long temp = steps;
+
+            //up
+            if (curY - 1 != prevY && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX && kvp.Key.Y == curY - 1).Key] != Symbol.Box)
+            {
+                temp = this.LongestPath(curX, curY - 1, steps + 1, curX, curY);
+            }
+
+            // down
+            if (curY + 1 != prevY && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX && kvp.Key.Y == curY + 1).Key] != Symbol.Box)
+            {
+                long temp1 = this.LongestPath(curX, curY + 1, steps + 1, curX, curY);
+                temp = temp1 > temp ? temp1 : temp;
+            }
+
+            // left
+            if (curX - 1 != prevX && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX - 1 && kvp.Key.Y == curY).Key] != Symbol.Box)
+            {
+                long temp1 = this.LongestPath(curX - 1, curY, steps + 1, curX, curY);
+                temp = temp1 > temp ? temp1 : temp;
+            }
+
+            // right
+            if (curX + 1 != prevX && this.Map[this.Map.FirstOrDefault(kvp => kvp.Key.X == curX + 1 && kvp.Key.Y == curY).Key] != Symbol.Box)
+            {
+                long temp1 = this.LongestPath(curX + 1, curY, steps + 1, curX, curY);
+                temp = temp1 > temp ? temp1 : temp;
+            }
+
+            return temp;
         }
     }
 }

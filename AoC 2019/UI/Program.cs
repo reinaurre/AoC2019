@@ -124,9 +124,13 @@ namespace UI
             //Console.WriteLine("Day 14 Part 2:");
             //Day14Part2();
 
+            //Console.WriteLine();
+            //Console.WriteLine("Day 15 Part 1:");
+            //Day15Part1();
+
             Console.WriteLine();
-            Console.WriteLine("Day 15 Part 1:");
-            Day15Part1();
+            Console.WriteLine("Day 15 Part 2:");
+            Day15Part2();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit.");
@@ -914,8 +918,8 @@ namespace UI
 
         public static void Day15Part1()
         {
-            //string fileName = "Day15/OfficialInput.txt";
-            string fileName = "Day15/ZyrInput.txt";
+            string fileName = "Day15/OfficialInput.txt";
+            //string fileName = "Day15/ZyrInput.txt";
 
             string[] lines = File.ReadAllLines(fileName);
 
@@ -923,11 +927,33 @@ namespace UI
             {
                 RepairBotController RBC = new RepairBotController(0, 0, str);
                 RBC.ExecuteWanderProgram();
+                long output = RBC.GetShortestPath();
 
-                //int output = RBC.Map.Count;
+                Console.WriteLine("Minimum Steps:");
+                Console.WriteLine(output);
 
-                //Console.WriteLine("Number Painted:");
-                //Console.WriteLine(output);
+                // Uncomment for just final output (make sure to comment these lines in RobotController)
+                //MapMaker MM = new MapMaker(RC.PaintMap.Keys.ToList(), Node.Symbol.Empty);
+                //MM.PopulatePaintMap(RC.PaintMap);
+                //MM.PrintWholeMap(true);
+            }
+        }
+
+        public static void Day15Part2()
+        {
+            string fileName = "Day15/OfficialInput.txt";
+            //string fileName = "Day15/ZyrInput.txt";
+
+            string[] lines = File.ReadAllLines(fileName);
+
+            foreach (string str in lines)
+            {
+                RepairBotController RBC = new RepairBotController(0, 0, str);
+                RBC.ExecuteWanderProgram();
+                long output = RBC.GetLongestPath();
+
+                Console.WriteLine("Maximum Steps:");
+                Console.WriteLine(output);
 
                 // Uncomment for just final output (make sure to comment these lines in RobotController)
                 //MapMaker MM = new MapMaker(RC.PaintMap.Keys.ToList(), Node.Symbol.Empty);

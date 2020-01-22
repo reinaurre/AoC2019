@@ -14,7 +14,9 @@ namespace Utilities
         Up = 'U',
         Down = 'D',
         Left = 'L',
-        Right = 'R'
+        Right = 'R',
+        Forward = 'F',
+        Back = 'B'
     }
 
     public enum Symbol
